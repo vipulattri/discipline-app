@@ -896,19 +896,38 @@ function renderBlocker(st){
   if(!st){ try{ st=JSON.parse(Native.getStatus()); }catch(e){ st={}; } }
   c.innerHTML=`<div class="row between"><h2 style="margin:0">🛡️ Porn blocker</h2><span class="chip ${st.blocker?'on':''}">${st.blocker?'● ON':'○ OFF'}</span></div>
     <div class="small mut" style="margin:8px 0 10px;line-height:1.5">${st.blocker
-      ? `Active. Typing a porn word or opening an adult site in Chrome or any app sends you back to the home screen. Blocked <b style="color:var(--txt)">${st.blocked||0}</b> time${st.blocked==1?'':'s'} so far.`
+      ? `Active. Typing a porn word or opening an adult site in Chrome or any app sends you back to the home screen. You've rejected porn <b style="color:var(--txt)">${st.blocked||0}</b> time${st.blocked==1?'':'s'} so far 💪`
       : `Turn it on: tap the button → <b style="color:var(--txt)">Installed apps</b> (or Downloaded apps) → <b style="color:var(--txt)">Discipline porn blocker</b> → On. If Android says the setting is restricted: App info → ⋮ (top right) → <b style="color:var(--txt)">Allow restricted settings</b>, then try again.`}</div>
     ${st.blocker?'':'<button class="btn pri block" data-n="acc">Turn on blocker</button>'}
     <div class="small mut" style="margin-top:12px">Your own extra words / sites to block:</div>
     <div class="row" style="margin-top:6px"><input id="bwInput" placeholder="e.g. an app or site name" maxlength="40"><button class="btn" data-n="bwadd">Add</button></div>
     <div class="miles" style="margin-top:8px">${words.map((w,i)=>`<span class="mile">${esc(w)} <button class="del" data-bw="${i}">✕</button></span>`).join('')}</div>${dns}`;
 }
+const REJECT = [
+ 'Every time you say NO to this, you become a stronger man.',
+ 'This urge is lying to you. Ten minutes of pleasure, a whole day of regret.',
+ 'You didn\'t come this far to restart at day zero.',
+ 'Real men don\'t chase pixels. Close it and go build your life.',
+ 'The man you want to become would walk away right now. So walk away.',
+ 'Remember how you felt the last time you gave in. Never again.',
+ 'Discipline is remembering what you want most, not what you want now.',
+ 'Your brain is healing. Don\'t feed the thing you are starving.',
+ 'Strong mind. Clean eyes. Clear future.',
+ 'The urge passes in 15 minutes. Your streak can last forever.',
+ 'Reject it today and tomorrow it will be weaker.',
+ 'Nobody will remember this moment except you. Make it a proud one.',
+];
 window.onBlocked = d => {
   goTab('streak');
-  showModal(`<h3>🛡️ Blocked — you're stronger than this urge</h3>
-    <p class="mut" style="margin-bottom:10px">Your streak is still alive. Do one of these right now:</p>
-    <ul class="list"><li>🚶 Stand up and walk out of the room</li><li>💪 20 push-ups</li><li>💧 Cold water on your face</li><li>📵 Put the phone away for 15 minutes</li></ul>
-    <div class="acts"><button class="btn pri" data-m="ok">I've got this</button></div>`);
+  const n = (d && d.count) || 1;
+  const q = REJECT[(n-1) % REJECT.length];
+  const days = state.settings ? Math.floor((Date.now()-state.settings.streakStart)/DAY) : 0;
+  showModal(`<div style="text-align:center"><div style="font-size:44px">🛡️</div>
+    <div class="sp-day" style="margin-top:6px">Rejection #${n} · Day ${days} clean</div>
+    <div class="sp-q" style="font-size:21px">“${esc(q)}”</div>
+    <p class="mut" style="margin-top:12px">You just rejected porn <b style="color:var(--txt)">${n}</b> time${n>1?'s':''}. Every rejection rewires your brain.</p></div>
+    <ul class="list" style="margin-top:10px"><li>🚶 Stand up and leave the room</li><li>💪 20 push-ups right now</li><li>💧 Cold water on your face</li><li>📵 Phone away for 15 minutes</li></ul>
+    <div class="acts"><button class="btn pri" data-m="ok">I reject it 💪</button></div>`);
 };
 document.addEventListener('click', e=>{
   const b=e.target.closest('[data-n]'), x=e.target.closest('[data-bw]');

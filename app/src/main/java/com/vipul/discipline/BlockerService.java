@@ -170,8 +170,8 @@ public class BlockerService extends AccessibilityService {
         }, 900);
         handler.postDelayed(() -> {
             long start = Util.prefs(this).getLong("streakStart", 0);
-            String msg = "🚫 Blocked. Stay strong";
-            if (start > 0) msg += " — day " + ((now - start) / 86400000L) + " of your streak";
+            String msg = "🛡️ Rejection #" + count + ". You said NO. Stay strong";
+            if (start > 0) msg += " — day " + ((now - start) / 86400000L) + " clean";
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             try {
                 Intent i = new Intent(this, MainActivity.class)
