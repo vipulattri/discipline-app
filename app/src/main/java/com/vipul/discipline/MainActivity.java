@@ -31,6 +31,8 @@ public class MainActivity extends Activity {
     private WebView web;
     private final Handler main = new Handler(Looper.getMainLooper());
     private boolean capturing = false;
+    private boolean pageReady = false;
+    private boolean pendingBlocked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,14 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setAllowFileAccess(true);
         web.setWebChromeClient(new WebChromeClient());
+        pendingBlocked = getIntent() != null && getIntent().getBooleanExtra("blocked", false);
         web.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                pageReady = true;
+                if (pendingBlocked) { pendingBlocked = false; notifyBlocked(); }
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 Uri u = req.getUrl();
@@ -63,6 +72,19 @@ public class MainActivity extends Activity {
         } catch (Exception ignored) {}
         web.loadUrl("file:///android_asset/index.html");
         askPermissions();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent != null && intent.getBooleanExtra("blocked", false)) {
+            if (pageReady) notifyBlocked(); else pendingBlocked = true;
+        }
+    }
+
+    private void notifyBlocked() {
+        callJs("onBlocked", "{\"count\":" + Util.prefs(this).getInt("blockedCount", 0) + "}");
     }
 
     @Override
@@ -227,6 +249,26 @@ public class MainActivity extends Activity {
             if (s == null) return false;
             main.post(() -> s.alertLeft(true));
             return true;
+        }
+
+        @JavascriptInterface
+        public void openAccessibility() {
+            main.post(() -> {
+                try { startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)); } catch (Exception ignored) {}
+            });
+        }
+
+        @JavascriptInterface
+        public void setBlockWords(String json) {
+            Util.prefs(MainActivity.this).edit().putString("blockWords", json)
+                    .putLong("wordsVersion", System.currentTimeMillis()).apply();
+        }
+
+        @JavascriptInterface
+        public void setStreak(String startMs) {
+            try {
+                Util.prefs(MainActivity.this).edit().putLong("streakStart", Long.parseLong(startMs)).apply();
+            } catch (Exception ignored) {}
         }
 
         @JavascriptInterface

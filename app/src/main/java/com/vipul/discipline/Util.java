@@ -96,6 +96,8 @@ final class Util {
             o.put("notif", Build.VERSION.SDK_INT < 33 || has(c, Manifest.permission.POST_NOTIFICATIONS));
             o.put("watching", GuardService.instance != null);
             o.put("lastDist", (double) prefs(c).getFloat("lastDist", -1f));
+            o.put("blocker", BlockerService.isEnabled(c));
+            o.put("blocked", prefs(c).getInt("blockedCount", 0));
         } catch (Exception ignored) {}
         return o;
     }

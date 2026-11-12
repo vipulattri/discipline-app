@@ -201,6 +201,7 @@ nav button.on{color:var(--acc)}
       <div class="card"><div class="mut small">Best streak</div><div style="font-size:26px;font-weight:800" id="sBest">0d</div></div>
       <div class="card"><div class="mut small">Total resets</div><div style="font-size:26px;font-weight:800" id="sResets">0</div></div>
     </div>
+    <div class="card" id="blockCard"></div>
     <div class="card"><h2>🏅 Milestones</h2><div class="miles" id="miles"></div></div>
     <div class="card">
       <h2>When an urge hits</h2>
@@ -765,7 +766,7 @@ function renderPG(st){
       ${st.home&&st.watching?'<button class="btn" data-n="test">Test alarm</button>':''}
     </div>`;
 }
-window.onNativeStatus = s => renderPG(s);
+window.onNativeStatus = s => { renderPG(s); renderBlocker(s); };
 window.onNativeHome = s => { toast(s.ok ? '📍 PG location saved' : (s.msg||'Could not get location')); renderPG(); };
 document.addEventListener('click', e=>{
   const b=e.target.closest('[data-n]'); if(!b||!NATIVE) return;
@@ -774,6 +775,50 @@ document.addEventListener('click', e=>{
   if(a==='bg') Native.requestBackground();
   if(a==='settings') Native.openSettings();
   if(a==='test'){ syncNative(); if(!Native.testAlarm()) toast('Location watch is not running yet'); }
+});
+
+/* ---------- porn blocker ---------- */
+let lastStreakSent='', lastWordsSent='';
+function syncBlocker(){
+  if(!NATIVE || !state.settings) return;
+  const st=String(state.settings.streakStart);
+  if(st!==lastStreakSent){ lastStreakSent=st; try{ Native.setStreak(st); }catch(e){} }
+  const w=JSON.stringify(state.settings.blockWords||[]);
+  if(w!==lastWordsSent){ lastWordsSent=w; try{ Native.setBlockWords(w); }catch(e){} }
+}
+function renderBlocker(st){
+  const c=$('#blockCard'); if(!c||!state.settings) return;
+  const words=state.settings.blockWords||[];
+  const dns=`<div class="small mut" style="margin-top:12px;line-height:1.5"><b style="color:var(--txt)">Extra layer — block adult sites on the whole phone:</b> Settings → Network &amp; internet → <b>Private DNS</b> → Private DNS provider hostname → type <b style="color:var(--acc)">family-filter-dns.cleanbrowsing.org</b> → Save. This also covers Wi-Fi and mobile data in every app.</div>`;
+  if(!NATIVE){
+    c.innerHTML=`<h2>🛡️ Porn blocker</h2><div class="small mut" style="line-height:1.5">The blocker runs in the Android app: when you type a porn word or open an adult site in Chrome or any app, it sends you back to the home screen.</div>${dns}`;
+    return;
+  }
+  if(!st){ try{ st=JSON.parse(Native.getStatus()); }catch(e){ st={}; } }
+  c.innerHTML=`<div class="row between"><h2 style="margin:0">🛡️ Porn blocker</h2><span class="chip ${st.blocker?'on':''}">${st.blocker?'● ON':'○ OFF'}</span></div>
+    <div class="small mut" style="margin:8px 0 10px;line-height:1.5">${st.blocker
+      ? `Active. Typing a porn word or opening an adult site in Chrome or any app sends you back to the home screen. Blocked <b style="color:var(--txt)">${st.blocked||0}</b> time${st.blocked==1?'':'s'} so far.`
+      : `Turn it on: tap the button → <b style="color:var(--txt)">Installed apps</b> (or Downloaded apps) → <b style="color:var(--txt)">Discipline porn blocker</b> → On. If Android says the setting is restricted: App info → ⋮ (top right) → <b style="color:var(--txt)">Allow restricted settings</b>, then try again.`}</div>
+    ${st.blocker?'':'<button class="btn pri block" data-n="acc">Turn on blocker</button>'}
+    <div class="small mut" style="margin-top:12px">Your own extra words / sites to block:</div>
+    <div class="row" style="margin-top:6px"><input id="bwInput" placeholder="e.g. an app or site name" maxlength="40"><button class="btn" data-n="bwadd">Add</button></div>
+    <div class="miles" style="margin-top:8px">${words.map((w,i)=>`<span class="mile">${esc(w)} <button class="del" data-bw="${i}">✕</button></span>`).join('')}</div>${dns}`;
+}
+window.onBlocked = d => {
+  goTab('streak');
+  showModal(`<h3>🛡️ Blocked — you're stronger than this urge</h3>
+    <p class="mut" style="margin-bottom:10px">Your streak is still alive. Do one of these right now:</p>
+    <ul class="list"><li>🚶 Stand up and walk out of the room</li><li>💪 20 push-ups</li><li>💧 Cold water on your face</li><li>📵 Put the phone away for 15 minutes</li></ul>
+    <div class="acts"><button class="btn pri" data-m="ok">I've got this</button></div>`);
+};
+document.addEventListener('click', e=>{
+  const b=e.target.closest('[data-n]'), x=e.target.closest('[data-bw]');
+  if(b && NATIVE){
+    if(b.dataset.n==='acc') Native.openAccessibility();
+    if(b.dataset.n==='bwadd'){ const v=$('#bwInput').value.trim().toLowerCase(); if(v.length<2){ toast('Type a word first'); return; }
+      state.settings.blockWords=(state.settings.blockWords||[]).concat([v]); saveSettings(); renderAll(); toast('Added to blocker'); }
+  }
+  if(x){ state.settings.blockWords=(state.settings.blockWords||[]).filter((_,i)=>i!=x.dataset.bw); saveSettings(); renderAll(); }
 });
 
 /* ---------- reminders ---------- */
@@ -799,7 +844,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   renderAll(); window.scrollTo({top:0});
 });
 let lastDay=dk();
-function renderAll(){ if(!state.settings) return; renderToday(); renderWorkout(); renderStreak(); renderStats(); renderPlan(); renderTimer(); syncNative(); }
+function renderAll(){ if(!state.settings) return; renderToday(); renderWorkout(); renderStreak(); renderStats(); renderPlan(); renderTimer(); syncNative(); syncBlocker(); renderBlocker(); }
 setInterval(()=>{
   if(timer && timer.running){ const n=Date.now(); timer.left-= (n-timer.last)/1000; timer.last=n; if(timer.left<=0) finishTimer(false); else renderTimer(); }
   renderStreakTick();
