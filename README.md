@@ -1,4 +1,4 @@
-# Discipline
+# ARG
 
 Daily routine tracker, clean-streak counter and PG-leave alarm for Android.
 

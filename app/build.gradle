@@ -10,12 +10,22 @@ android {
         applicationId 'com.vipul.discipline'
         minSdk 26
         targetSdk 34
-        versionCode 3
-        versionName '1.2'
+        versionCode 4
+        versionName '2.0'
+    }
+
+    signingConfigs {
+        arg {
+            storeFile file('arg.keystore')
+            storePassword 'argapp2026'
+            keyAlias 'arg'
+            keyPassword 'argapp2026'
+        }
     }
 
     buildTypes {
-        release { minifyEnabled false }
+        debug { signingConfig signingConfigs.arg }
+        release { minifyEnabled false; signingConfig signingConfigs.arg }
     }
 
     compileOptions {

@@ -19,7 +19,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
-        android:label="Discipline"
+        android:label="ARG"
         android:theme="@android:style/Theme.Material.NoActionBar">
 
         <activity
@@ -43,7 +43,7 @@
         <service
             android:name=".BlockerService"
             android:exported="true"
-            android:label="Discipline porn blocker"
+            android:label="ARG porn blocker"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

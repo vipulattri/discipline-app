@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Discipline — Daily Routine & Streak</title>
+<title>ARG — Daily Discipline</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -111,6 +111,16 @@ nav button.on{color:var(--acc)}
 .ex .tip{font-size:13px;color:var(--mut);line-height:1.45}
 .ex .tact{margin-top:8px}
 .wk-title{font-size:18px;font-weight:800}
+#splash{position:fixed;inset:0;z-index:70;background:radial-gradient(circle at 50% 30%,#1c2a1f 0%,#0d1117 60%);display:flex;align-items:center;justify-content:center;padding:28px;text-align:center;transition:opacity .4s}
+#splash.hide{opacity:0;pointer-events:none}
+.sp-in{max-width:520px;animation:rise .7s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.sp-day{margin-top:14px;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#f97316}
+.sp-q{margin-top:16px;font-size:24px;line-height:1.35;font-weight:800;letter-spacing:-.3px}
+.sp-a{margin-top:12px;color:var(--mut);font-size:14px}
+.quote{border-left:4px solid #f97316;background:linear-gradient(90deg,#2a1a0e,var(--card) 70%)}
+.quote .q{font-weight:700;font-size:15px;line-height:1.45}
+.quote .a{color:var(--mut);font-size:12px;margin-top:6px}
 @media(max-width:420px){.fig{width:96px;height:96px}}
 @media(min-width:760px){
   body{padding-bottom:0;padding-top:64px}
@@ -133,7 +143,7 @@ nav button.on{color:var(--acc)}
 
 <div class="wrap">
   <header>
-    <div><h1 id="hello">Good morning</h1><div class="sub" id="dateline"></div></div>
+    <div><div style="font-size:12px;font-weight:800;letter-spacing:3px;color:#f97316">🔥 ARG</div><h1 id="hello">Good morning</h1><div class="sub" id="dateline"></div></div>
     <div class="row" style="flex-wrap:wrap;justify-content:flex-end">
       <span class="chip" id="soundChip">🔇 Tap to enable sound</span>
       <span class="chip" id="syncChip">⏳ Loading</span>
@@ -155,6 +165,7 @@ nav button.on{color:var(--acc)}
 
   <!-- TODAY -->
   <section class="view on" id="v-today">
+    <div class="card quote" id="quoteCard"></div>
     <div class="next">
       <div class="card"><div class="k">Progress</div><div class="v" id="nProg">0 / 0</div></div>
       <div class="card"><div class="k">Next sunscreen</div><div class="v" id="nSun">—</div></div>
@@ -250,6 +261,13 @@ nav button.on{color:var(--acc)}
   </section>
 </div>
 
+<div id="splash"><div class="sp-in">
+  <div class="sp-logo"><svg viewBox="0 0 108 108" width="84" height="84"><defs><linearGradient id="spf" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#EA580C"/><stop offset=".6" stop-color="#F97316"/><stop offset="1" stop-color="#FACC15"/></linearGradient></defs><path d="M54,22C62,34 74,42 74,60C74,73 65,83 54,83C43,83 34,73 34,60C34,50 40,44 44,37C45,45 48,49 51,51C50,41 50,32 54,22Z" fill="url(#spf)"/><path fill="#fff" d="M54,46L65,59L58.5,59L58.5,74L49.5,74L49.5,59L43,59Z"/></svg></div>
+  <div class="sp-day" id="spDay"></div>
+  <div class="sp-q" id="spQ"></div>
+  <div class="sp-a" id="spA"></div>
+  <button class="btn pri" id="spGo" style="margin-top:28px;padding:14px 34px;font-size:16px">Let's go 🔥</button>
+</div></div>
 <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -416,7 +434,7 @@ function startTimer(id){
 function confirmSwitch(){ toast('Switched timer'); return true; }
 function renderTimer(){
   const bar=$('#timerbar');
-  if(!timer){ bar.classList.remove('show'); document.title='Discipline — Daily Routine & Streak'; return; }
+  if(!timer){ bar.classList.remove('show'); document.title='ARG — Daily Discipline'; return; }
   bar.classList.add('show');
   $('#tbName').textContent=timer.name;
   const l=Math.max(0,Math.ceil(timer.left)); const txt = (l>=3600? Math.floor(l/3600)+':':'')+pad(Math.floor(l%3600/60))+':'+pad(l%60);
@@ -777,6 +795,74 @@ document.addEventListener('click', e=>{
   if(a==='test'){ syncNative(); if(!Native.testAlarm()) toast('Location watch is not running yet'); }
 });
 
+/* ---------- daily quote ---------- */
+const QUOTES = [
+ ['Discipline is choosing what you want most over what you want now.','ARG'],
+ ['You don\'t rise to your goals. You fall to the level of your daily habits.','ARG'],
+ ['The urge will pass in 15 minutes. Your regret would last all day. Wait it out.','ARG'],
+ ['Every day you stay clean, you are rebuilding the man you were meant to be.','ARG'],
+ ['Small steps every day beat big plans you never start.','ARG'],
+ ['Nobody is coming to save you. Get up and do it yourself.','ARG'],
+ ['Motivation gets you started. Discipline keeps you going.','ARG'],
+ ['Your future self is watching what you do right now.','ARG'],
+ ['Win the morning, win the day.','ARG'],
+ ['Hard choices, easy life. Easy choices, hard life.','ARG'],
+ ['A strong body, a clear mind and a clean streak — build all three today.','ARG'],
+ ['You are not tired, you are uninspired. Start the timer and begin.','ARG'],
+ ['The pain of discipline is far less than the pain of regret.','ARG'],
+ ['Respect yourself enough to walk away from what is destroying you.','ARG'],
+ ['Do it tired. Do it bored. Just do it.','ARG'],
+ ['One more rep. One more page. One more clean day.','ARG'],
+ ['Comfort is the enemy of growth.','ARG'],
+ ['Show up even on the days you don\'t feel like it. Especially on those days.','ARG'],
+ ['Your skin, your body, your mind — they all reflect your daily choices.','ARG'],
+ ['Be the man your younger self would be proud of.','ARG'],
+ ['Don\'t count the days. Make the days count.','ARG'],
+ ['Focus on progress, not perfection.','ARG'],
+ ['Real confidence comes from keeping promises to yourself.','ARG'],
+ ['Every expert was once a beginner who refused to quit.','ARG'],
+ ['Silence the phone. Open the book. Change your life.','ARG'],
+ ['The best time to start was yesterday. The next best time is now.','ARG'],
+ ['Strong men are made in quiet hours that nobody sees.','ARG'],
+ ['If it doesn\'t challenge you, it doesn\'t change you.','ARG'],
+ ['Fall seven times, stand up eight.','Japanese proverb'],
+ ['We are what we repeatedly do. Excellence, then, is not an act but a habit.','after Aristotle'],
+ ['He who conquers himself is the mightiest warrior.','after Confucius'],
+ ['No man is free who is not master of himself.','Epictetus'],
+ ['Luck is what happens when preparation meets opportunity.','Seneca'],
+ ['Waste no more time arguing what a good man should be. Be one.','Marcus Aurelius'],
+ ['You have power over your mind, not outside events. Realize this, and you will find strength.','Marcus Aurelius'],
+ ['The journey of a thousand miles begins with a single step.','Lao Tzu'],
+ ['It does not matter how slowly you go as long as you do not stop.','Confucius'],
+ ['Difficulties strengthen the mind, as labour does the body.','Seneca'],
+ ['First say to yourself what you would be; then do what you have to do.','Epictetus'],
+ ['Arise, awake, and stop not till the goal is reached.','Swami Vivekananda'],
+ ['Take up one idea. Make that one idea your life. Think of it, dream of it, live on that idea.','Swami Vivekananda'],
+ ['You have the right to work, but never to the fruit of work.','Bhagavad Gita'],
+ ['A man is but the product of his thoughts. What he thinks, he becomes.','Mahatma Gandhi'],
+ ['Strength does not come from physical capacity. It comes from an indomitable will.','Mahatma Gandhi'],
+ ['Dream is not that which you see while sleeping; it is something that does not let you sleep.','A. P. J. Abdul Kalam'],
+ ['If you want to shine like a sun, first burn like a sun.','A. P. J. Abdul Kalam'],
+];
+function dayIndex(){ const d=new Date(); return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()) - Date.UTC(2026,0,1))/DAY); }
+function todayQuote(){ const n=QUOTES.length; return QUOTES[((dayIndex()%n)+n)%n]; }
+function renderQuote(){
+  const [q,a]=todayQuote();
+  $('#quoteCard').innerHTML=`<div class="small" style="color:#f97316;font-weight:800;letter-spacing:1px;margin-bottom:6px">🔥 TODAY'S QUOTE</div><div class="q">“${esc(q)}”</div><div class="a">— ${esc(a)}</div>`;
+}
+function showSplash(){
+  const [q,a]=todayQuote();
+  const days = state.settings ? Math.floor((Date.now()-state.settings.streakStart)/DAY) : 0;
+  $('#spDay').textContent = new Date().toLocaleDateString([], {weekday:'long', day:'numeric', month:'long'}) + (state.settings?` · Day ${days} clean`:'');
+  $('#spQ').textContent='“'+q+'”'; $('#spA').textContent='— '+a;
+  $('#splash').classList.remove('hide');
+}
+$('#spGo').onclick=()=>$('#splash').classList.add('hide');
+document.addEventListener('visibilitychange',()=>{ // reopening the app later in the day shows it again
+  if(document.visibilityState==='visible'){ const t=Date.now(); if(t-(window._hiddenAt||t) > 30*60000) showSplash(); }
+  else window._hiddenAt=Date.now();
+});
+
 /* ---------- porn blocker ---------- */
 let lastStreakSent='', lastWordsSent='';
 function syncBlocker(){
@@ -844,7 +930,7 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   renderAll(); window.scrollTo({top:0});
 });
 let lastDay=dk();
-function renderAll(){ if(!state.settings) return; renderToday(); renderWorkout(); renderStreak(); renderStats(); renderPlan(); renderTimer(); syncNative(); syncBlocker(); renderBlocker(); }
+function renderAll(){ if(!state.settings) return; renderQuote(); renderToday(); renderWorkout(); renderStreak(); renderStats(); renderPlan(); renderTimer(); syncNative(); syncBlocker(); renderBlocker(); }
 setInterval(()=>{
   if(timer && timer.running){ const n=Date.now(); timer.left-= (n-timer.last)/1000; timer.last=n; if(timer.left<=0) finishTimer(false); else renderTimer(); }
   renderStreakTick();
@@ -852,7 +938,7 @@ setInterval(()=>{
 },1000);
 setInterval(()=>{ checkReminders(); renderToday(); renderPlan(); syncNative(); renderPG(); }, 15000);
 checkReminders(); renderPG();
-init();
+init(); showSplash();
 </script>
 </body>
 </html>
