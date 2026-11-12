@@ -14,7 +14,7 @@ final class Reminders {
     };
     static final String[] TITLES = {
             "Good morning ☀️", "Shampoo day 🧼", "Sunscreen 🧴", "Sunscreen 🧴", "Sunscreen 🧴", "Sunscreen 🧴",
-            "Study time 📚", "Dinner 🍽️", "Freelancing 💻", "Day done ✅"
+            "Face wash + study 📚", "Dinner 🍽️", "Freelancing 💻", "Day done ✅"
     };
     static final String[] MSGS = {
             "Start your routine: walk → gym → face wash → ice roller → gua sha → serum → sunscreen → lip cream → lookmaxxing.",
@@ -23,7 +23,7 @@ final class Reminders {
             "Time to reapply sunscreen on your face.",
             "Time to reapply sunscreen on your face.",
             "Time to reapply sunscreen on your face.",
-            "Personal study starts now (7:30–9:00 PM). Open the app and start the timer.",
+            "Wash your face, then personal study (7:30–9:00 PM). Open the app and start the timer.",
             "Dinner break (9:00–9:30 PM).",
             "Freelancing work starts now (9:30–11:00 PM). Start the timer.",
             "Mark your tasks in the app and wind down. No phone in bed."

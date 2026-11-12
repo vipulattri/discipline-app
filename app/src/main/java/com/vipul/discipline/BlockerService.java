@@ -1,6 +1,8 @@
 package com.vipul.discipline;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.ActivityManager;
+import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -26,7 +28,7 @@ public class BlockerService extends AccessibilityService {
 
     /** Matched anywhere, after removing spaces/symbols (catches "p o r n", "porn-hub"). */
     static final List<String> SUBSTRINGS = Arrays.asList(
-            "porn", "xvideos", "xnxx", "xhamster", "redtube", "youporn", "brazzers", "onlyfans",
+            "porn", "fuck", "xvideos", "xnxx", "xhamster", "redtube", "youporn", "brazzers", "onlyfans",
             "hentai", "chaturbate", "spankbang", "eporner", "stripchat", "rule34", "nsfw", "fapello",
             "beeg", "tube8", "motherless", "camsoda", "livejasmin", "bongacams", "chudai", "antarvasna",
             "indianxxx", "desixxx", "sexvideo", "sexyvideo", "nudevideo", "nangivideo", "masturbat");
@@ -115,12 +117,12 @@ public class BlockerService extends AccessibilityService {
         if (type == AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED) {
             StringBuilder sb = new StringBuilder();
             for (CharSequence c : e.getText()) sb.append(c).append(' ');
-            if (matches(sb)) { block(); return; }
+            if (matches(sb)) { block(pkg, e.getSource()); return; }
         }
         if (type == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             StringBuilder sb = new StringBuilder();
             for (CharSequence c : e.getText()) sb.append(c).append(' ');
-            if (matches(sb)) { block(); return; }
+            if (matches(sb)) { block(pkg, null); return; }
         }
         // Browser address bars (throttled)
         long now = System.currentTimeMillis();
@@ -135,21 +137,37 @@ public class BlockerService extends AccessibilityService {
                 List<AccessibilityNodeInfo> nodes = root.findAccessibilityNodeInfosByViewId(id);
                 if (nodes == null) continue;
                 for (AccessibilityNodeInfo n : nodes) {
-                    if (n != null && matches(n.getText())) { block(); return; }
+                    if (n != null && matches(n.getText())) { block(pkg, n); return; }
                 }
             }
         } catch (Exception ignored) {}
     }
 
-    private void block() {
+    private void block(String pkg, AccessibilityNodeInfo field) {
         long now = System.currentTimeMillis();
         if (now - lastBlock < 2500) return;
         lastBlock = now;
+        // 1. wipe what was typed so it can't be searched
+        try {
+            if (field != null && field.isEditable()) {
+                Bundle b = new Bundle();
+                b.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, "");
+                field.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, b);
+            }
+        } catch (Exception ignored) {}
         int count = Util.prefs(this).getInt("blockedCount", 0) + 1;
         Util.prefs(this).edit().putInt("blockedCount", count).putLong("lastBlocked", now).apply();
 
+        // 2. back out of the page, go home, then close the app
         performGlobalAction(GLOBAL_ACTION_BACK);
-        handler.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_HOME), 150);
+        handler.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_BACK), 120);
+        handler.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_HOME), 260);
+        handler.postDelayed(() -> {
+            try {
+                ActivityManager am = getSystemService(ActivityManager.class);
+                if (am != null && !pkg.equals(getPackageName())) am.killBackgroundProcesses(pkg);
+            } catch (Exception ignored) {}
+        }, 900);
         handler.postDelayed(() -> {
             long start = Util.prefs(this).getLong("streakStart", 0);
             String msg = "🚫 Blocked. Stay strong";
@@ -161,7 +179,7 @@ public class BlockerService extends AccessibilityService {
                         .putExtra("blocked", true);
                 startActivity(i);
             } catch (Exception ignored) {}
-        }, 450);
+        }, 1100);
     }
 
     @Override
