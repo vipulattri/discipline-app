@@ -17,7 +17,7 @@ final class Reminders {
             "Study time 📚", "Dinner 🍽️", "Freelancing 💻", "Day done ✅"
     };
     static final String[] MSGS = {
-            "Start your routine: walk → gym → face wash → ice roller → gua sha → sunscreen → lip cream.",
+            "Start your routine: walk → gym → face wash → ice roller → gua sha → serum → sunscreen → lip cream → lookmaxxing.",
             "It's Wednesday — wash your hair with shampoo after the walk.",
             "Time to reapply sunscreen on your face.",
             "Time to reapply sunscreen on your face.",

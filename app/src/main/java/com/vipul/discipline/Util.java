@@ -29,7 +29,7 @@ final class Util {
     static final String CH_GUARD = "guard";
 
     static final List<String> DEFAULT_MUST = Arrays.asList(
-            "Morning walk", "Gym", "Face wash", "Ice roller", "Gua sha", "Sunscreen", "Lip cream");
+            "Morning walk", "Gym", "Face wash", "Ice roller", "Gua sha", "Apply serum", "Sunscreen", "Lip cream");
 
     private Util() {}
 
