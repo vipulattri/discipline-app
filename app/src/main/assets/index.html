@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discipline — Daily Routine & Streak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--card:#161b22;--card2:#1c2330;--line:#2a3240;--txt:#e6edf3;--mut:#8b96a5;
+  --acc:#2dd4bf;--acc2:#14b8a6;--good:#22c55e;--warn:#f59e0b;--bad:#ef4444;--blue:#60a5fa;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;padding-bottom:84px;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit;color:var(--txt);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+header h1{font-size:20px;font-weight:800;letter-spacing:-.3px}
+header .sub{color:var(--mut);font-size:13px;margin-top:2px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--mut);white-space:nowrap}
+.chip.on{color:var(--acc);border-color:#1f5f58}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mut{color:var(--mut)}.small{font-size:12px}
+h2{font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 7px;border-radius:6px;background:#3b1d1d;color:#fca5a5}
+.badge.g{background:#123326;color:#86efac}
+.prog{height:10px;background:var(--card2);border-radius:99px;overflow:hidden}
+.prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:99px;transition:width .4s}
+.btn{padding:11px 16px;border-radius:12px;font-weight:600;background:var(--card2);border:1px solid var(--line)}
+.btn.pri{background:var(--acc);color:#04201c;border-color:var(--acc)}
+.btn.bad{background:var(--bad);color:#fff;border-color:var(--bad)}
+.btn.block{width:100%}
+.leave{width:100%;padding:16px;border-radius:14px;font-weight:700;font-size:16px;background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;margin-bottom:14px;box-shadow:0 6px 20px #b91c1c33}
+.task{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:var(--card2);border:1px solid transparent;margin-bottom:8px;transition:.2s}
+.task.done{opacity:.55}
+.task.done .tname{text-decoration:line-through}
+.task.active{border-color:var(--acc);box-shadow:0 0 0 3px #2dd4bf22}
+.ticon{font-size:22px;width:40px;height:40px;display:grid;place-items:center;background:var(--card);border-radius:10px;flex:none}
+.tbody{flex:1;min-width:0}
+.tname{font-weight:600;font-size:15px}
+.tmeta{color:var(--mut);font-size:12px;margin-top:2px}
+.tact{display:flex;gap:6px;flex:none}
+.ib{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);font-size:16px}
+.ib.ok{background:var(--good);border-color:var(--good);color:#052e14}
+.ib.play{color:var(--acc)}
+.del{font-size:12px;color:var(--mut);padding:4px}
+.timerbar{position:sticky;top:0;z-index:20;background:#0f2a27;border:1px solid #1f5f58;border-radius:14px;padding:12px 14px;margin-bottom:14px;display:none}
+.timerbar.show{display:block}
+.tbig{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#0d1117ee;backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+nav .in{display:flex;max-width:860px;width:100%}
+nav button{flex:1;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--mut);font-weight:600}
+nav button span{font-size:20px}
+nav button.on{color:var(--acc)}
+.view{display:none}.view.on{display:block}
+.streak-big{text-align:center;padding:26px 10px}
+.streak-big .n{font-size:84px;font-weight:800;line-height:1;background:linear-gradient(135deg,#5eead4,#22c55e);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-3px}
+.hms{display:flex;justify-content:center;gap:10px;margin-top:14px}
+.hms div{background:var(--card2);border-radius:12px;padding:10px 0;width:72px;text-align:center}
+.hms b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+.hms small{color:var(--mut);font-size:11px}
+.miles{display:flex;flex-wrap:wrap;gap:8px}
+.mile{padding:8px 12px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:13px;color:var(--mut)}
+.mile.got{border-color:#166534;background:#0f2a1a;color:#86efac}
+.ring{width:110px;height:110px;position:relative;margin:0 auto}
+.ring svg{transform:rotate(-90deg)}
+.ring .v{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;font-size:22px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding-top:10px}
+.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bars .b i{display:block;width:100%;max-width:38px;border-radius:8px 8px 4px 4px;background:var(--acc2);min-height:3px}
+.bars .b.today i{background:var(--acc)}
+.bars .b small{font-size:11px;color:var(--mut)}
+.bars .b em{font-style:normal;font-size:11px;color:var(--txt)}
+.list li{list-style:none;display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.list li:last-child{border:0}
+.tl{position:relative;padding-left:18px}
+.tl:before{content:"";position:absolute;left:5px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl .it{position:relative;padding:8px 0}
+.tl .it:before{content:"";position:absolute;left:-17px;top:13px;width:10px;height:10px;border-radius:50%;background:var(--acc)}
+.tl .it.now:before{box-shadow:0 0 0 4px #2dd4bf44;background:var(--warn)}
+.tl b{font-variant-numeric:tabular-nums;color:var(--acc);margin-right:8px}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
+.modal.show{display:flex}
+.mbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;max-width:420px;width:100%;max-height:90vh;overflow:auto}
+.mbox.alarm{border-color:var(--bad);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px #ef444433}}
+.mbox h3{font-size:18px;margin-bottom:8px}
+.mbox .acts{display:flex;gap:10px;margin-top:16px}
+.mbox .acts .btn{flex:1}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:10px 16px;border-radius:12px;font-size:14px;z-index:60;opacity:0;transition:.3s;pointer-events:none}
+.toast.show{opacity:1}
+.next{display:flex;gap:10px;overflow-x:auto;margin-bottom:14px}
+.next .card{margin:0;flex:1;min-width:150px;padding:12px}
+.next .k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.next .v{font-size:17px;font-weight:700;margin-top:4px}
+@media(min-width:760px){
+  body{padding-bottom:0;padding-top:64px}
+  nav{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line)}
+  nav button{flex-direction:row;justify-content:center;gap:8px;font-size:14px;padding:16px}
+  nav button span{font-size:18px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .toast{bottom:24px}
+}
+</style>
+</head>
+<body>
+<nav><div class="in">
+  <button data-v="today" class="on"><span>✅</span>Today</button>
+  <button data-v="streak"><span>🔥</span>Streak</button>
+  <button data-v="stats"><span>📊</span>Dashboard</button>
+  <button data-v="plan"><span>🗓️</span>Schedule</button>
+</div></nav>
+
+<div class="wrap">
+  <header>
+    <div><h1 id="hello">Good morning</h1><div class="sub" id="dateline"></div></div>
+    <div class="row" style="flex-wrap:wrap;justify-content:flex-end">
+      <span class="chip" id="soundChip">🔇 Tap to enable sound</span>
+      <span class="chip" id="syncChip">⏳ Loading</span>
+    </div>
+  </header>
+
+  <div class="timerbar" id="timerbar">
+    <div class="row between">
+      <div><div class="small mut">Running timer</div><div style="font-weight:700" id="tbName"></div></div>
+      <div class="tbig" id="tbTime">00:00</div>
+    </div>
+    <div class="prog" style="margin:10px 0"><i id="tbProg" style="width:0"></i></div>
+    <div class="row">
+      <button class="btn" id="tbPause" style="flex:1">Pause</button>
+      <button class="btn pri" id="tbDone" style="flex:1">Finish now</button>
+      <button class="btn" id="tbStop">✕</button>
+    </div>
+  </div>
+
+  <!-- TODAY -->
+  <section class="view on" id="v-today">
+    <div class="next">
+      <div class="card"><div class="k">Progress</div><div class="v" id="nProg">0 / 0</div></div>
+      <div class="card"><div class="k">Next sunscreen</div><div class="v" id="nSun">—</div></div>
+      <div class="card"><div class="k">Streak</div><div class="v" id="nStreak">—</div></div>
+    </div>
+    <div class="prog" style="margin-bottom:14px"><i id="todayProg" style="width:0"></i></div>
+    <div class="card" id="pgCard" style="display:none"></div>
+    <button class="leave" id="leaveBtn">🚪 I'm leaving home / PG — check me</button>
+    <div class="cols">
+      <div>
+        <div class="card"><h2>🌅 Morning routine <span class="badge">Compulsory</span></h2><div id="g-morning"></div></div>
+        <div class="card"><h2>🧴 Sunscreen every 3 hours</h2><div id="g-sun"></div></div>
+      </div>
+      <div>
+        <div class="card"><h2>🌙 Evening plan</h2><div id="g-evening"></div></div>
+        <div class="card">
+          <div class="row between"><h2 style="margin:0">⭐ My extra tasks</h2><button class="chip on" id="addTask">+ Add</button></div>
+          <div id="g-custom" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STREAK -->
+  <section class="view" id="v-streak">
+    <div class="card streak-big">
+      <div class="mut small" style="text-transform:uppercase;letter-spacing:1px;font-weight:700">Clean streak — no porn, no masturbation</div>
+      <div class="n" id="sDays">0</div>
+      <div style="font-weight:600;margin-top:4px">days</div>
+      <div class="hms">
+        <div><b id="sH">00</b><small>hours</small></div>
+        <div><b id="sM">00</b><small>min</small></div>
+        <div><b id="sS">00</b><small>sec</small></div>
+      </div>
+      <div class="mut small" style="margin-top:14px" id="sSince"></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="mut small">Best streak</div><div style="font-size:26px;font-weight:800" id="sBest">0d</div></div>
+      <div class="card"><div class="mut small">Total resets</div><div style="font-size:26px;font-weight:800" id="sResets">0</div></div>
+    </div>
+    <div class="card"><h2>🏅 Milestones</h2><div class="miles" id="miles"></div></div>
+    <div class="card">
+      <h2>When an urge hits</h2>
+      <ul class="list">
+        <li>🚶 Leave the room or go for a 10-minute walk</li>
+        <li>💪 Do 20 push-ups or a cold face wash</li>
+        <li>📵 Put the phone in another room; study on the laptop</li>
+        <li>⏱️ Urges peak and fade in about 15 minutes — wait it out</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Adjust</h2>
+      <div class="small mut" style="margin-bottom:8px">Already clean before using this app? Set your real start date.</div>
+      <div class="row"><input type="datetime-local" id="startInput"><button class="btn" id="setStart">Set</button></div>
+      <button class="btn bad block" style="margin-top:12px" id="relapseBtn">I slipped — reset the counter</button>
+    </div>
+    <div class="card"><h2>📜 Past attempts</h2><ul class="list" id="attempts"></ul></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="view" id="v-stats">
+    <div class="grid2">
+      <div class="card" style="text-align:center"><div class="mut small" style="margin-bottom:8px">Today</div><div class="ring" id="ringToday"></div></div>
+      <div class="card" style="text-align:center"><div class="mut small" style="margin-bottom:8px">Yesterday</div><div class="ring" id="ringYest"></div></div>
+    </div>
+    <div class="card"><h2>📈 Last 7 days</h2><div class="bars" id="bars"></div></div>
+    <div class="grid2">
+      <div class="card"><div class="mut small">Perfect days (7d)</div><div style="font-size:26px;font-weight:800" id="perfect">0</div></div>
+      <div class="card"><div class="mut small">Sunscreen applied (7d)</div><div style="font-size:26px;font-weight:800" id="sunCount">0</div></div>
+    </div>
+    <div class="cols">
+      <div class="card"><h2>Today</h2><ul class="list" id="listToday"></ul></div>
+      <div class="card"><h2>Yesterday</h2><ul class="list" id="listYest"></ul></div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="view" id="v-plan">
+    <div class="card"><h2>🗓️ Your daily schedule</h2><div class="tl" id="timeline"></div></div>
+    <div class="card small mut" style="line-height:1.6">
+      Keep this page open (phone or laptop) and it rings at each time above, while the page is open.
+      For alarms that ring even when the page is closed, use the alarms on your phone's clock app.<br><br>
+      Websites can't track your location in the background, so before you step out, tap <b style="color:var(--txt)">"I'm leaving home / PG"</b> on the Today tab.
+      If a compulsory task is still pending, the alarm goes off and shows you what's left.
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- definitions ---------- */
+const TASKS = [
+  {id:'walk',    g:'morning', icon:'🚶', name:'Morning walk',         min:30, time:'06:00', must:true},
+  {id:'shampoo', g:'morning', icon:'🧼', name:'Shampoo (Wednesday)',  min:10, time:'06:30', must:true, days:[3]},
+  {id:'gym',     g:'morning', icon:'🏋️', name:'Gym',                  min:60, time:'06:45', must:true},
+  {id:'facewash',g:'morning', icon:'💧', name:'Face wash',            min:2,  time:'07:50', must:true},
+  {id:'ice',     g:'morning', icon:'🧊', name:'Ice roller',           min:5,  time:'07:55', must:true},
+  {id:'guasha',  g:'morning', icon:'🪨', name:'Gua sha',              min:5,  time:'08:00', must:true},
+  {id:'sun0',    g:'morning', icon:'🧴', name:'Sunscreen',            min:2,  time:'08:05', must:true},
+  {id:'lip',     g:'morning', icon:'💋', name:'Lip cream',            min:1,  time:'08:07', must:true},
+  {id:'sun1',    g:'sun',     icon:'🧴', name:'Sunscreen reapply',    min:2,  time:'09:00'},
+  {id:'sun2',    g:'sun',     icon:'🧴', name:'Sunscreen reapply',    min:2,  time:'12:00'},
+  {id:'sun3',    g:'sun',     icon:'🧴', name:'Sunscreen reapply',    min:2,  time:'15:00'},
+  {id:'sun4',    g:'sun',     icon:'🧴', name:'Sunscreen reapply',    min:2,  time:'18:00'},
+  {id:'study',   g:'evening', icon:'📚', name:'Personal study',       min:90, time:'19:30', end:'21:00'},
+  {id:'dinner',  g:'evening', icon:'🍽️', name:'Dinner',               min:30, time:'21:00', end:'21:30'},
+  {id:'free',    g:'evening', icon:'💻', name:'Freelancing work',     min:90, time:'21:30', end:'23:00'},
+];
+const REMINDERS = [
+  {t:'06:00', msg:'Good morning! Start your routine: walk → gym → face wash → ice roller → gua sha → sunscreen → lip cream.'},
+  {t:'06:00', msg:'It\'s Wednesday — shampoo day. Wash your hair after the walk.', days:[3]},
+  {t:'09:00', msg:'🧴 Time to reapply sunscreen.'},
+  {t:'12:00', msg:'🧴 Time to reapply sunscreen.'},
+  {t:'15:00', msg:'🧴 Time to reapply sunscreen.'},
+  {t:'18:00', msg:'🧴 Time to reapply sunscreen.'},
+  {t:'19:30', msg:'📚 Personal study starts now (7:30–9:00 PM). Start the timer.'},
+  {t:'21:00', msg:'🍽️ Dinner break (9:00–9:30 PM).'},
+  {t:'21:30', msg:'💻 Freelancing work starts now (9:30–11:00 PM). Start the timer.'},
+  {t:'23:00', msg:'✅ Day done. Mark your tasks and wind down — no phone in bed.'},
+];
+const MILES = [1,3,7,14,21,30,60,90,180,365];
+const DAY = 86400000;
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2,'0');
+const dk = (d=new Date()) => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const keyDate = k => { const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); };
+const hm = t => { const [h,m]=t.split(':').map(Number); return h*60+m; };
+const fmt12 = t => { if(!t) return ''; let [h,m]=t.split(':').map(Number); const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+pad(m)+' '+ap; };
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2400); }
+
+/* ---------- state & storage ---------- */
+let state = { settings:null, days:{} };
+let colRef = null, mode = 'loading';
+const LS = 'discipline-app-v1';
+function defaultSettings(){ return { streakStart: Date.now(), best: 0, attempts: [], custom: [] }; }
+function loadLocal(){ try{ const s=JSON.parse(localStorage.getItem(LS)||'null'); if(s) state=s; }catch(e){} if(!state.settings) state.settings=defaultSettings(); }
+function saveLocal(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+const chains = {};
+function persist(id, data){
+  if(mode!=='cloud'){ saveLocal(); return; }
+  const body = JSON.parse(JSON.stringify(data));
+  chains[id] = (chains[id]||Promise.resolve()).then(()=>colRef.doc(id).set(body)).catch(e=>{ toast('Could not save ('+(e&&e.code||'error')+')'); });
+}
+const saveSettings = () => persist('settings', state.settings);
+const day = k => state.days[k] || (state.days[k] = {done:{}});
+const saveDay = k => persist('day-'+k, day(k));
+function setSync(txt, on){ const c=$('#syncChip'); c.textContent=txt; c.classList.toggle('on',!!on); }
+
+function useLocal(why){
+  if(mode==='cloud') return;
+  mode='local'; loadLocal(); setSync(why||'💾 Saved on this device'); renderAll();
+}
+
+async function init(){
+  loadLocal(); renderAll();
+  const to = setTimeout(()=>{ if(mode==='loading') useLocal('⚠️ Sync unreachable — saving locally'); }, 10000);
+  let db=null, uid=null;
+  try{
+    if(window.claude && claude.use){
+      db = await claude.use('db');
+      const u = await claude.use('user');
+      uid = u ? await u.id() : null;
+    }
+  }catch(e){}
+  if(!db || !uid){ clearTimeout(to); useLocal(); return; }
+  colRef = db.collection('data/users/'+uid);
+  colRef.onSnapshot(snap=>{
+    const days={}; let settings=null;
+    snap.docs.forEach(d=>{
+      const v = JSON.parse(JSON.stringify(d.data()||{}));
+      if(d.id==='settings') settings=v; else if(d.id.startsWith('day-')) days[d.id.slice(4)] = {done:v.done||{}};
+    });
+    if(!snap.metadata.fromCache){
+      clearTimeout(to);
+      if(mode!=='cloud'){
+        mode='cloud';
+        // first time on this account: carry over anything saved locally
+        if(!settings){ settings = (state.settings && state.settings.streakStart) ? state.settings : defaultSettings(); state.settings=settings; saveSettings(); }
+      }
+      setSync('☁️ Synced across devices', true);
+    }
+    if(settings){ settings.attempts=settings.attempts||[]; settings.custom=settings.custom||[]; state.settings=settings; }
+    if(mode==='cloud' || snap.docs.length){ state.days = days; }
+    renderAll();
+  }, err=>{ clearTimeout(to); mode='loading'; useLocal('⚠️ Sync off — saving locally'); });
+}
+
+/* ---------- tasks ---------- */
+function tasksFor(date){
+  const wd = date.getDay();
+  const custom = (state.settings&&state.settings.custom||[]).map(c=>({...c, g:'custom'}));
+  return TASKS.concat(custom).filter(t=>!t.days || t.days.includes(wd));
+}
+function isDone(k,id){ return !!(state.days[k] && state.days[k].done && state.days[k].done[id]); }
+function setDone(id, val){
+  const k=dk(); const d=day(k);
+  if(val) d.done[id]=Date.now(); else delete d.done[id];
+  saveDay(k); renderAll();
+}
+function stats(k){
+  const list=tasksFor(keyDate(k)); const done=list.filter(t=>isDone(k,t.id)).length;
+  return {list, done, total:list.length, pct: list.length? Math.round(done*100/list.length):0};
+}
+
+function taskHTML(t){
+  const k=dk(), done=isDone(k,t.id), act = timer && timer.id===t.id;
+  const when = t.time ? fmt12(t.time)+(t.end?' – '+fmt12(t.end):'') : 'Any time';
+  return `<div class="task ${done?'done':''} ${act?'active':''}">
+    <div class="ticon">${esc(t.icon||'⭐')}</div>
+    <div class="tbody"><div class="tname">${esc(t.name)}</div>
+      <div class="tmeta">${when} · ${t.min} min${done?' · done '+new Date(state.days[k].done[t.id]).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):''}</div></div>
+    <div class="tact">
+      ${t.g==='custom'?`<button class="del" data-del="${esc(t.id)}" title="Delete">✕</button>`:''}
+      ${done?'':`<button class="ib play" data-play="${esc(t.id)}" title="Start timer">▶</button>`}
+      <button class="ib ${done?'ok':''}" data-check="${esc(t.id)}" title="${done?'Undo':'Mark done'}">✓</button>
+    </div></div>`;
+}
+function renderToday(){
+  const now=new Date(), k=dk(now), list=tasksFor(now);
+  ['morning','sun','evening','custom'].forEach(g=>{
+    const items=list.filter(t=>t.g===g);
+    $('#g-'+g).innerHTML = items.length? items.map(taskHTML).join('') : '<div class="mut small">No extra tasks yet. Add one with “+ Add”.</div>';
+  });
+  const s=stats(k);
+  $('#nProg').textContent = s.done+' / '+s.total;
+  $('#todayProg').style.width = s.pct+'%';
+  const mins = now.getHours()*60+now.getMinutes();
+  const nextSun = list.filter(t=>t.g==='sun' && !isDone(k,t.id)).find(t=>hm(t.time)>=mins-60);
+  $('#nSun').textContent = nextSun ? (hm(nextSun.time)<=mins ? 'Now!' : fmt12(nextSun.time)) : 'All done ✓';
+  const h=now.getHours();
+  $('#hello').textContent = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  $('#dateline').textContent = now.toLocaleDateString([], {weekday:'long', day:'numeric', month:'long'}) + (now.getDay()===3?' · 🧼 Shampoo day':'');
+}
+
+/* ---------- timer ---------- */
+let timer = null; // {id,name,total,left,running,last}
+function startTimer(id){
+  const t = tasksFor(new Date()).find(x=>x.id===id); if(!t) return;
+  if(timer && timer.id!==id && !confirmSwitch()) return;
+  timer = {id, name:t.name, total:t.min*60, left:t.min*60, running:true, last:Date.now()};
+  stopAlarm(); renderTimer(); renderToday();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function confirmSwitch(){ toast('Switched timer'); return true; }
+function renderTimer(){
+  const bar=$('#timerbar');
+  if(!timer){ bar.classList.remove('show'); document.title='Discipline — Daily Routine & Streak'; return; }
+  bar.classList.add('show');
+  $('#tbName').textContent=timer.name;
+  const l=Math.max(0,Math.ceil(timer.left)); const txt = (l>=3600? Math.floor(l/3600)+':':'')+pad(Math.floor(l%3600/60))+':'+pad(l%60);
+  $('#tbTime').textContent=txt;
+  $('#tbProg').style.width = (100-(timer.left/timer.total)*100)+'%';
+  $('#tbPause').textContent = timer.running?'Pause':'Resume';
+  document.title = '⏱ '+txt+' · '+timer.name;
+}
+function finishTimer(early){
+  const t=timer; if(!t) return;
+  timer=null; renderTimer(); renderToday();
+  if(!early) startAlarm();
+  showModal(`<h3>⏰ ${esc(t.name)}</h3><p class="mut">${early?'Finished early.':'Time is up!'} Did you complete this task?</p>
+    <div class="acts"><button class="btn" data-m="no">Not yet</button><button class="btn pri" data-m="yes">Yes, done ✓</button></div>`,
+    {yes:()=>{ setDone(t.id,true); toast('Nice! Task completed'); }, no:()=>{}}, !early);
+}
+$('#tbPause').onclick=()=>{ if(!timer) return; timer.running=!timer.running; timer.last=Date.now(); renderTimer(); };
+$('#tbDone').onclick=()=>finishTimer(true);
+$('#tbStop').onclick=()=>{ timer=null; renderTimer(); renderToday(); };
+
+/* ---------- sound ---------- */
+let ac=null, alarmIv=null;
+function unlock(){
+  try{ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); }catch(e){}
+  setTimeout(()=>{ const on = ac && ac.state==='running'; const c=$('#soundChip'); c.textContent= on?'🔔 Sound on':'🔇 Tap to enable sound'; c.classList.toggle('on',on); },100);
+}
+document.addEventListener('pointerdown', unlock);
+function beep(){
+  if(!ac || ac.state!=='running') return;
+  [0,.22,.44].forEach(d=>{ const o=ac.createOscillator(), g=ac.createGain(); o.type='square'; o.frequency.value=d===.44?1175:880; g.gain.setValueAtTime(.12,ac.currentTime+d); g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d+.18); o.connect(g); g.connect(ac.destination); o.start(ac.currentTime+d); o.stop(ac.currentTime+d+.2); });
+}
+function startAlarm(){ stopAlarm(); beep(); alarmIv=setInterval(beep,1100); try{ navigator.vibrate && navigator.vibrate([400,200,400,200,400]); }catch(e){} }
+function stopAlarm(){ clearInterval(alarmIv); alarmIv=null; }
+
+/* ---------- modal ---------- */
+function showModal(html, handlers={}, alarm=false){
+  const m=$('#modal'), b=$('#mbox');
+  b.innerHTML=html; b.classList.toggle('alarm',alarm); m.classList.add('show');
+  b.querySelectorAll('[data-m]').forEach(btn=>btn.onclick=()=>{ const f=handlers[btn.dataset.m]; stopAlarm(); const keep = f && f()===false; if(!keep) m.classList.remove('show'); });
+}
+
+/* ---------- leaving check ---------- */
+$('#leaveBtn').onclick=()=>{
+  const k=dk(), pending=tasksFor(new Date()).filter(t=>t.must && !isDone(k,t.id));
+  if(!pending.length){ showModal(`<h3>✅ All compulsory tasks done</h3><p class="mut">You're good to go. Carry your sunscreen!</p><div class="acts"><button class="btn pri" data-m="ok">Let's go</button></div>`); return; }
+  startAlarm();
+  showModal(`<h3>🚨 Stop! ${pending.length} task${pending.length>1?'s':''} not done</h3>
+    <p class="mut" style="margin-bottom:10px">Finish these before you leave:</p>
+    <ul class="list">${pending.map(t=>`<li>${t.icon} ${esc(t.name)}</li>`).join('')}</ul>
+    <div class="acts"><button class="btn" data-m="anyway">Leave anyway</button><button class="btn pri" data-m="ok">I'll do them now</button></div>`,
+    {anyway:()=>toast('Logged — try to finish them later'), ok:()=>{}}, true);
+};
+
+/* ---------- task events ---------- */
+document.addEventListener('click', e=>{
+  const p=e.target.closest('[data-play]'), c=e.target.closest('[data-check]'), d=e.target.closest('[data-del]');
+  if(p) startTimer(p.dataset.play);
+  if(c){ const id=c.dataset.check; const was=isDone(dk(),id); setDone(id,!was); if(timer&&timer.id===id){timer=null;renderTimer();} if(!was) toast('Task completed ✓'); }
+  if(d){ const id=d.dataset.del; showModal(`<h3>Delete this task?</h3><p class="mut">It will be removed from every day.</p><div class="acts"><button class="btn" data-m="no">Cancel</button><button class="btn bad" data-m="yes">Delete</button></div>`,
+      {yes:()=>{ state.settings.custom=state.settings.custom.filter(t=>t.id!==id); saveSettings(); renderAll(); }}); }
+});
+$('#addTask').onclick=()=>{
+  showModal(`<h3>Add a daily task</h3>
+    <div style="display:grid;gap:10px;margin-top:10px">
+      <input id="ctName" placeholder="Task name (e.g. Drink 3L water)" maxlength="60">
+      <div class="grid2"><input id="ctMin" type="number" min="1" max="300" value="10" placeholder="Minutes"><input id="ctTime" type="time"></div>
+      <input id="ctIcon" placeholder="Emoji (optional)" maxlength="4">
+    </div>
+    <div class="acts"><button class="btn" data-m="no">Cancel</button><button class="btn pri" data-m="yes">Add</button></div>`,
+  {yes:()=>{
+    const name=$('#ctName').value.trim(); if(!name){ toast('Enter a task name'); return false; }
+    const min=Math.max(1,Math.min(300,parseInt($('#ctMin').value)||10));
+    state.settings.custom.push({id:'c'+Date.now(), name, min, time:$('#ctTime').value||'', icon:$('#ctIcon').value.trim()||'⭐'});
+    saveSettings(); renderAll(); toast('Task added');
+  }});
+  setTimeout(()=>$('#ctName').focus(),50);
+};
+
+/* ---------- streak ---------- */
+function streakParts(){
+  const ms=Date.now()-state.settings.streakStart;
+  return {ms, d:Math.floor(ms/DAY), h:Math.floor(ms%DAY/3600000), m:Math.floor(ms%3600000/60000), s:Math.floor(ms%60000/1000)};
+}
+function renderStreakTick(){
+  if(!state.settings) return;
+  const p=streakParts();
+  $('#sDays').textContent=p.d; $('#sH').textContent=pad(p.h); $('#sM').textContent=pad(p.m); $('#sS').textContent=pad(p.s);
+  $('#nStreak').textContent = p.d+'d '+p.h+'h';
+}
+function renderStreak(){
+  const st=state.settings, p=streakParts();
+  $('#sSince').textContent='Since '+new Date(st.streakStart).toLocaleString([], {day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'});
+  const best=Math.max(st.best||0, p.ms);
+  $('#sBest').textContent=Math.floor(best/DAY)+'d';
+  $('#sResets').textContent=st.attempts.length;
+  $('#miles').innerHTML=MILES.map(m=>`<div class="mile ${p.d>=m?'got':''}">${p.d>=m?'🏆':'🔒'} ${m} day${m>1?'s':''}</div>`).join('');
+  $('#attempts').innerHTML = st.attempts.length ? st.attempts.slice().reverse().slice(0,20).map(a=>{
+    const len=a.end-a.start; return `<li>🔁 <span style="flex:1">${new Date(a.start).toLocaleDateString([], {day:'numeric',month:'short'})} → ${new Date(a.end).toLocaleDateString([], {day:'numeric',month:'short'})}</span><b>${Math.floor(len/DAY)}d ${Math.floor(len%DAY/3600000)}h</b></li>`;
+  }).join('') : '<li class="mut">No resets yet. Keep it that way 💪</li>';
+  renderStreakTick();
+}
+$('#relapseBtn').onclick=()=>{
+  showModal(`<h3>Reset your streak?</h3><p class="mut">One slip doesn't erase your progress. Your best streak is saved. Start again right now.</p>
+    <div class="acts"><button class="btn" data-m="no">Cancel</button><button class="btn bad" data-m="yes">Reset</button></div>`,
+  {yes:()=>{ const st=state.settings, now=Date.now(); st.best=Math.max(st.best||0, now-st.streakStart); st.attempts.push({start:st.streakStart,end:now}); st.streakStart=now; saveSettings(); renderAll(); toast('Day 0 — you\'ve got this'); }});
+};
+$('#setStart').onclick=()=>{
+  const v=$('#startInput').value; if(!v){ toast('Pick a date and time'); return; }
+  const t=new Date(v).getTime(); if(!(t<=Date.now())){ toast('Date must be in the past'); return; }
+  state.settings.streakStart=t; saveSettings(); renderAll(); toast('Start date updated');
+};
+
+/* ---------- dashboard ---------- */
+function ring(el, pct){
+  const r=46, c=2*Math.PI*r;
+  el.innerHTML=`<svg width="110" height="110"><circle cx="55" cy="55" r="${r}" fill="none" stroke="#1c2330" stroke-width="10"/>
+    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${pct>=80?'#22c55e':pct>=50?'#2dd4bf':'#f59e0b'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct/100)}"/></svg><div class="v">${pct}%</div>`;
+}
+function dayList(k){
+  return tasksFor(keyDate(k)).map(t=>`<li>${isDone(k,t.id)?'✅':'<span style="color:var(--bad)">✗</span>'} <span style="flex:1">${esc(t.name)}</span><span class="mut small">${t.time?fmt12(t.time):''}</span></li>`).join('');
+}
+function renderStats(){
+  const today=new Date(), k=dk(today), y=dk(new Date(today.getTime()-DAY));
+  ring($('#ringToday'), stats(k).pct); ring($('#ringYest'), stats(y).pct);
+  let bars='', perfect=0, sun=0;
+  for(let i=6;i>=0;i--){
+    const d=new Date(today.getFullYear(),today.getMonth(),today.getDate()-i), kk=dk(d), s=stats(kk);
+    if(s.total && s.done===s.total) perfect++;
+    sun += s.list.filter(t=>t.id.startsWith('sun') && isDone(kk,t.id)).length;
+    bars+=`<div class="b ${i===0?'today':''}"><em>${s.pct}%</em><i style="height:${Math.max(2,s.pct)}%"></i><small>${d.toLocaleDateString([], {weekday:'short'})}</small></div>`;
+  }
+  $('#bars').innerHTML=bars; $('#perfect').textContent=perfect; $('#sunCount').textContent=sun;
+  $('#listToday').innerHTML=dayList(k); $('#listYest').innerHTML=dayList(y);
+}
+
+/* ---------- schedule ---------- */
+function renderPlan(){
+  const now=new Date(), mins=now.getHours()*60+now.getMinutes();
+  const items=tasksFor(now).filter(t=>t.time).sort((a,b)=>hm(a.time)-hm(b.time));
+  $('#timeline').innerHTML=items.map(t=>{
+    const s=hm(t.time), e=t.end?hm(t.end):s+t.min, nowCls = mins>=s && mins<e ? 'now':'';
+    return `<div class="it ${nowCls}"><b>${fmt12(t.time)}</b>${esc(t.icon||'')} ${esc(t.name)} <span class="mut small">· ${t.min} min${t.must?' · compulsory':''}</span></div>`;
+  }).join('');
+}
+
+/* ---------- Android app bridge (PG location alarm) ---------- */
+const NATIVE = !!window.Native;
+let lastPend = '';
+function syncNative(){
+  if(!NATIVE || !state.settings) return;
+  const k=dk(), must=tasksFor(new Date()).filter(t=>t.must);
+  const j=JSON.stringify({date:k, pending:must.filter(t=>!isDone(k,t.id)).map(t=>t.name), all:must.map(t=>t.name)});
+  if(j!==lastPend){ lastPend=j; try{ Native.setPending(j); }catch(e){} }
+}
+function renderPG(st){
+  if(!NATIVE) return;
+  if(!st){ try{ st=JSON.parse(Native.getStatus()); }catch(e){ return; } }
+  const c=$('#pgCard'); c.style.display='block';
+  let info;
+  if(!st.loc) info='Allow location so the alarm can ring when you leave your PG/home.';
+  else if(!st.home) info='Not set yet. Stand inside your PG/home and tap the button below.';
+  else info=`Saved. If you go more than ${st.radius} m away while a compulsory task is pending, the alarm rings.`+(st.lastDist>=0?` You're about ${Math.round(st.lastDist)} m from it now.`:'');
+  c.innerHTML=`<div class="row between"><h2 style="margin:0">📍 PG / Home location</h2><span class="chip ${st.watching?'on':''}">${st.watching?'● Watching':'○ Off'}</span></div>
+    <div class="small mut" style="margin:8px 0 10px;line-height:1.5">${info}${st.loc&&!st.bg?'<br><span style="color:var(--warn)">Tip: allow location “all the time” so it keeps working when the app is closed.</span>':''}${!st.notif?'<br><span style="color:var(--warn)">Notifications are off — turn them on so you see the alarm.</span>':''}</div>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn pri" data-n="home">${st.home?'Reset to current location':'Use current location as PG'}</button>
+      ${st.loc&&!st.bg?'<button class="btn" data-n="bg">Allow all the time</button>':''}
+      ${!st.loc||!st.notif?'<button class="btn" data-n="settings">Open settings</button>':''}
+      ${st.home&&st.watching?'<button class="btn" data-n="test">Test alarm</button>':''}
+    </div>`;
+}
+window.onNativeStatus = s => renderPG(s);
+window.onNativeHome = s => { toast(s.ok ? '📍 PG location saved' : (s.msg||'Could not get location')); renderPG(); };
+document.addEventListener('click', e=>{
+  const b=e.target.closest('[data-n]'); if(!b||!NATIVE) return;
+  const a=b.dataset.n;
+  if(a==='home'){ toast('Getting your location… stay still'); Native.setHome(); }
+  if(a==='bg') Native.requestBackground();
+  if(a==='settings') Native.openSettings();
+  if(a==='test'){ syncNative(); if(!Native.testAlarm()) toast('Location watch is not running yet'); }
+});
+
+/* ---------- reminders ---------- */
+const fired = new Set(); try{ JSON.parse(sessionStorage.getItem('fired')||'[]').forEach(x=>fired.add(x)); }catch(e){}
+function checkReminders(){
+  if(NATIVE) return; // the Android app rings these as real notifications
+  const now=new Date(), k=dk(now), cur=pad(now.getHours())+':'+pad(now.getMinutes());
+  REMINDERS.forEach((r,i)=>{
+    if(r.days && !r.days.includes(now.getDay())) return;
+    const id=k+'#'+i;
+    if(r.t===cur && !fired.has(id)){
+      fired.add(id); try{ sessionStorage.setItem('fired',JSON.stringify([...fired])); }catch(e){}
+      startAlarm();
+      showModal(`<h3>⏰ ${fmt12(r.t)}</h3><p>${esc(r.msg)}</p><div class="acts"><button class="btn pri" data-m="ok">Got it</button></div>`, {}, true);
+    }
+  });
+}
+
+/* ---------- nav & loop ---------- */
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on', v.id==='v-'+b.dataset.v));
+  renderAll(); window.scrollTo({top:0});
+});
+let lastDay=dk();
+function renderAll(){ if(!state.settings) return; renderToday(); renderStreak(); renderStats(); renderPlan(); renderTimer(); syncNative(); }
+setInterval(()=>{
+  if(timer && timer.running){ const n=Date.now(); timer.left-= (n-timer.last)/1000; timer.last=n; if(timer.left<=0) finishTimer(false); else renderTimer(); }
+  renderStreakTick();
+  if(dk()!==lastDay){ lastDay=dk(); renderAll(); }
+},1000);
+setInterval(()=>{ checkReminders(); renderToday(); renderPlan(); syncNative(); renderPG(); }, 15000);
+checkReminders(); renderPG();
+init();
+</script>
+</body>
+</html>
