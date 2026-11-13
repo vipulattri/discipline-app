@@ -18,7 +18,6 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -28,8 +27,14 @@ final class Util {
     static final String CH_LEAVE = "leave_alarm";
     static final String CH_GUARD = "guard";
 
-    static final List<String> DEFAULT_MUST = Arrays.asList(
-            "Morning walk", "Gym", "Face wash", "Ice roller", "Gua sha", "Apply serum", "Sunscreen", "Lip cream");
+    /** CD Homes PG, Sector 48, Gurugram (fixed). */
+    static final double PG_LAT = 28.4111865;
+    static final double PG_LNG = 77.0350941;
+    static final String PG_NAME = "CD Homes PG";
+
+    /** Morning tasks checked when you leave, with their start time in minutes after midnight. */
+    static final String[] DEFAULT_NAMES = {"Face wash", "Ice roller", "Gua sha", "Apply serum", "Sunscreen", "Lip cream", "Lookmaxxing exercises"};
+    static final int[] DEFAULT_TIMES = {470, 475, 480, 485, 488, 490, 492};
 
     private Util() {}
 
@@ -37,11 +42,16 @@ final class Util {
         return c.getSharedPreferences("discipline", Context.MODE_PRIVATE);
     }
 
-    static boolean hasHome(Context c) { return prefs(c).contains("lat"); }
+    static boolean hasHome(Context c) { return true; }
 
-    static double lat(Context c) { return Double.parseDouble(prefs(c).getString("lat", "0")); }
+    static double lat(Context c) { return PG_LAT; }
 
-    static double lng(Context c) { return Double.parseDouble(prefs(c).getString("lng", "0")); }
+    static double lng(Context c) { return PG_LNG; }
+
+    static boolean weighDue(Context c) {
+        long t = prefs(c).getLong("weighDue", 0L);
+        return t > 0 && System.currentTimeMillis() >= t;
+    }
 
     static int radius(Context c) { return prefs(c).getInt("radius", 150); }
 
@@ -70,26 +80,40 @@ final class Util {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
     }
 
-    /** Compulsory tasks still pending today, as last reported by the app UI. */
+    /**
+     * Morning tasks that are due (their time has come) but not ticked off today.
+     * Walk and gym are done outside, so the app doesn't send them.
+     */
     static List<String> pending(Context c) {
-        String s = prefs(c).getString("pending", null);
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        int now = cal.get(java.util.Calendar.HOUR_OF_DAY) * 60 + cal.get(java.util.Calendar.MINUTE);
         List<String> out = new ArrayList<>();
-        if (s == null) return new ArrayList<>(DEFAULT_MUST);
+        String s = prefs(c).getString("pending", null);
         try {
-            JSONObject o = new JSONObject(s);
-            JSONArray a = today().equals(o.optString("date")) ? o.optJSONArray("pending") : o.optJSONArray("all");
-            if (a == null) return new ArrayList<>(DEFAULT_MUST);
-            for (int i = 0; i < a.length(); i++) out.add(a.getString(i));
-        } catch (Exception e) {
-            return new ArrayList<>(DEFAULT_MUST);
-        }
+            if (s != null) {
+                JSONObject o = new JSONObject(s);
+                JSONArray items = o.optJSONArray("items");
+                if (items != null) {
+                    boolean isToday = today().equals(o.optString("date"));
+                    for (int i = 0; i < items.length(); i++) {
+                        JSONObject it = items.getJSONObject(i);
+                        if (it.optInt("t", 0) > now) continue;
+                        if (isToday && it.optBoolean("d", false)) continue;
+                        out.add(it.optString("n"));
+                    }
+                    return out;
+                }
+            }
+        } catch (Exception ignored) {}
+        for (int i = 0; i < DEFAULT_NAMES.length; i++) if (DEFAULT_TIMES[i] <= now) out.add(DEFAULT_NAMES[i]);
         return out;
     }
 
     static JSONObject status(Context c) {
         JSONObject o = new JSONObject();
         try {
-            o.put("home", hasHome(c));
+            o.put("home", true);
+            o.put("pg", PG_NAME);
             o.put("radius", radius(c));
             o.put("loc", hasLocation(c));
             o.put("bg", hasBackground(c));

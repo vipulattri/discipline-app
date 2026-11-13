@@ -11,6 +11,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context c, Intent intent) {
         int i = intent.getIntExtra("i", -1);
         if (i < 0 || i >= Reminders.TIMES.length) return;
+        if (i == Reminders.WEIGH && !Util.weighDue(c)) { Reminders.schedule(c, i); return; }
         Util.ensureChannels(c);
         Notification n = new Notification.Builder(c, Util.CH_REMIND)
                 .setSmallIcon(R.drawable.ic_stat)

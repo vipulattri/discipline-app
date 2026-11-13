@@ -123,8 +123,8 @@ public class MainActivity extends Activity {
     }
 
     private void afterPermissions() {
-        // First launch: use where you are right now as the PG/home location.
-        if (Util.hasLocation(this) && !Util.hasHome(this)) captureHome();
+        // The PG location is fixed (CD Homes PG), so just start watching.
+        startGuardIfReady();
     }
 
     private void startGuardIfReady() {
@@ -209,7 +209,14 @@ public class MainActivity extends Activity {
         public String getStatus() { return Util.status(MainActivity.this).toString(); }
 
         @JavascriptInterface
-        public void setHome() { main.post(MainActivity.this::captureHome); }
+        public void setHome() { main.post(MainActivity.this::pushStatus); }
+
+        @JavascriptInterface
+        public void setWeighDue(String ms) {
+            try {
+                Util.prefs(MainActivity.this).edit().putLong("weighDue", Long.parseLong(ms)).apply();
+            } catch (Exception ignored) {}
+        }
 
         @JavascriptInterface
         public void setPending(String json) {

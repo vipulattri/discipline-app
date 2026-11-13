@@ -86,8 +86,8 @@ public class GuardService extends Service implements LocationListener {
     private void goForeground() {
         Notification n = new Notification.Builder(this, Util.CH_GUARD)
                 .setSmallIcon(R.drawable.ic_stat)
-                .setContentTitle("Watching your PG location")
-                .setContentText("Alarm rings if you leave with compulsory tasks pending")
+                .setContentTitle("Watching CD Homes PG")
+                .setContentText("Alarm rings if you leave with morning tasks pending")
                 .setOngoing(true)
                 .setContentIntent(Util.openApp(this, 10))
                 .build();
@@ -145,7 +145,7 @@ public class GuardService extends Service implements LocationListener {
         if (pending.isEmpty()) {
             Notification ok = new Notification.Builder(this, Util.CH_LEAVE)
                     .setSmallIcon(R.drawable.ic_stat)
-                    .setContentTitle(test ? "Test: all tasks done ✅" : "All compulsory tasks done ✅")
+                    .setContentTitle(test ? "Test: all tasks done ✅" : "All morning tasks done ✅")
                     .setContentText("Have a great day. Carry your sunscreen!")
                     .setAutoCancel(true)
                     .build();
