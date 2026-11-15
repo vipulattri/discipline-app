@@ -11,12 +11,12 @@ import java.util.Calendar;
 final class Reminders {
     static final int[][] TIMES = {
             {6, 0}, {6, 1}, {9, 0}, {12, 0}, {15, 0}, {18, 0}, {19, 30}, {21, 0}, {21, 30}, {23, 0},
-            {6, 2}, {7, 48}, {17, 0}
+            {6, 2}, {7, 48}, {17, 0}, {19, 31}
     };
     static final String[] TITLES = {
             "Good morning ☀️", "Shampoo day 🧼", "Sunscreen 🧴", "Sunscreen 🧴", "Sunscreen 🧴", "Sunscreen 🧴",
             "Face wash + serum + study 📚", "Dinner 🍽️", "Freelancing 💻", "Day done ✅",
-            "Monthly weigh-in ⚖️", "Protein after gym 🥛", "Protein snack 🫘"
+            "Monthly weigh-in ⚖️", "Protein after gym 🥛", "Protein snack 🫘", "Dermaroller night 🪡"
     };
     static final String[] MSGS = {
             "Start your routine: walk → gym → face wash → ice roller → gua sha → serum → sunscreen → lip cream → lookmaxxing.",
@@ -31,10 +31,11 @@ final class Reminders {
             "Mark your tasks in the app and wind down. No phone in bed.",
             "It's been a month. Weigh yourself now, before eating, and log it in ARG → Body.",
             "Have your whey shake (1 scoop) now.",
-            "Soya chunks, sprouts or roasted chana — keep protein up and skip the junk."
+            "Soya chunks, sprouts or roasted chana — keep protein up and skip the junk.",
+            "On your clean face, roll gently (up-down, side-to-side, diagonal), then apply serum. Disinfect the roller after."
     };
-    /** 0 = every day, Calendar.WEDNESDAY = Wednesdays only, -1 = Monday to Saturday (gym days). */
-    static final int[] DAY = {0, java.util.Calendar.WEDNESDAY, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0};
+    /** 0 = every day, Calendar.WEDNESDAY = Wednesdays only, -1 = Monday to Saturday (gym days), -2 = Wednesday and Sunday. */
+    static final int[] DAY = {0, java.util.Calendar.WEDNESDAY, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -2};
     static final int WEIGH = 10;
 
     private Reminders() {}
@@ -52,8 +53,11 @@ final class Reminders {
         if (cal.getTimeInMillis() <= System.currentTimeMillis() + 1000) cal.add(Calendar.DAY_OF_YEAR, 1);
         if (DAY[i] > 0) {
             while (cal.get(Calendar.DAY_OF_WEEK) != DAY[i]) cal.add(Calendar.DAY_OF_YEAR, 1);
-        } else if (DAY[i] < 0 && cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+        } else if (DAY[i] == -1 && cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
             cal.add(Calendar.DAY_OF_YEAR, 1);
+        } else if (DAY[i] == -2) {
+            while (cal.get(Calendar.DAY_OF_WEEK) != Calendar.WEDNESDAY && cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)
+                cal.add(Calendar.DAY_OF_YEAR, 1);
         }
         Intent it = new Intent(c, AlarmReceiver.class).putExtra("i", i);
         PendingIntent pi = PendingIntent.getBroadcast(c, 100 + i, it,
