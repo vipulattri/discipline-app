@@ -111,6 +111,13 @@ nav button.on{color:var(--acc)}
 .ex .tip{font-size:13px;color:var(--mut);line-height:1.45}
 .ex .tact{margin-top:8px}
 .wk-title{font-size:18px;font-weight:800}
+.gymcard{border-left:4px solid #f97316}
+.gsec{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--mut);margin:12px 0 6px}
+.gex{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:var(--card2);margin-bottom:6px;border:1px solid transparent}
+.gex.done{opacity:.55}.gex.done .gn{text-decoration:line-through}
+.gex.active{border-color:var(--acc);box-shadow:0 0 0 3px #2dd4bf22}
+.gex .gn{font-weight:600;font-size:14px}.gex .gs{font-size:12px;color:var(--acc);font-weight:700;margin-top:2px}
+.gex .gb{flex:1;min-width:0}
 .ex.hasph{flex-direction:column}
 .ph{position:relative;width:100%;max-width:420px;aspect-ratio:3/2;border-radius:12px;overflow:hidden;background:#000}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -203,6 +210,7 @@ select{font:inherit;color:var(--txt);background:var(--card2);border:1px solid va
     <div class="cols">
       <div>
         <div class="card"><h2>🌅 Morning routine <span class="badge">Compulsory</span></h2><div id="g-morning"></div></div>
+        <div class="card gymcard" id="gymToday"></div>
         <div class="card"><h2>🧴 Sunscreen every 3 hours</h2><div id="g-sun"></div></div>
       </div>
       <div>
@@ -454,6 +462,7 @@ function renderToday(){
     const items=list.filter(t=>t.g===g);
     $('#g-'+g).innerHTML = items.length? items.map(taskHTML).join('') : '<div class="mut small">No extra tasks yet. Add one with “+ Add”.</div>';
   });
+  renderGymToday();
   const s=stats(k);
   $('#nProg').textContent = s.done+' / '+s.total;
   $('#todayProg').style.width = s.pct+'%';
@@ -465,14 +474,55 @@ function renderToday(){
   $('#dateline').textContent = now.toLocaleDateString([], {weekday:'long', day:'numeric', month:'long'}) + (now.getDay()===3?' · 🧼 Shampoo day':'');
 }
 
+/* ---------- today's gym (morning) ---------- */
+function gexRow(id){
+  const ex=EX[id]; if(!ex) return '';
+  const key='ex-g-'+id, done=isDone(dk(),key), act=timer && timer.id===key;
+  const sets=ex.sets.replace('{c}',phase().cardio).replace('{h}',phase().hiit);
+  return `<div class="gex ${done?'done':''} ${act?'active':''}"><div class="gb"><div class="gn">${esc(ex.name)}</div><div class="gs">${esc(sets)} · ⏱ ${exMinutes(id)} min</div></div>
+    ${done?'':`<button class="ib play" data-play="${key}" title="Start timer">▶</button>`}
+    <button class="ib ${done?'ok':''}" data-ex="${key}" title="${done?'Undo':'Done'}">✓</button></div>`;
+}
+function renderGymToday(){
+  const el=$('#gymToday'); if(!el || typeof PLAN==='undefined') return;
+  const wd=new Date().getDay(), p=PLAN[wd];
+  if(!p.ex.length){ el.innerHTML=`<h2>🏋️ Today's gym</h2><div class="mut small" style="line-height:1.5">Sunday is active rest — no weights. Go for a long brisk walk and stretch.</div>`; return; }
+  const ids=dayIds(wd), cardio=cardioFor(wd), doneN=ids.filter(id=>isDone(dk(),'ex-g-'+id)).length;
+  const restAct = timer && timer.id==='rest';
+  el.innerHTML=`<div class="row between"><h2 style="margin:0">🏋️ Today's gym — ${esc(p.title)}</h2><span class="chip ${doneN===ids.length?'on':''}">${doneN}/${ids.length}</span></div>
+    <div class="prog" style="margin:10px 0 4px"><i style="width:${Math.round(doneN*100/ids.length)}%"></i></div>
+    <div class="row" style="gap:8px;margin-top:10px">
+      <button class="btn ${restAct?'':'pri'}" data-play="rest" style="flex:1">⏱ Rest 90 s</button>
+      <button class="btn" data-open="gym" style="flex:1">📋 Photos & tips</button>
+    </div>
+    ${p.warm.length?`<div class="gsec">🔥 Warm-up</div>`+p.warm.map(gexRow).join(''):''}
+    <div class="gsec">🏋️ Weights</div>${p.ex.map(gexRow).join('')}
+    ${cardio.length?`<div class="gsec">🏃 Cardio</div>`+cardio.map(gexRow).join(''):''}
+    <button class="btn ${isDone(dk(),'gym')?'':'pri'} block" data-finish="gym" style="margin-top:10px">${isDone(dk(),'gym')?'✓ Gym done for today':'Finish workout → mark Gym done'}</button>`;
+}
+
 /* ---------- timer ---------- */
 let timer = null; // {id,name,total,left,running,last}
+// Minutes for one exercise: "5 min" → 5; "4 × 10" → 4 sets × 2.5 min (set + rest)
+function exMinutes(id){
+  const ex=EX[id]; if(!ex) return 3;
+  const sets=ex.sets.replace('{c}',phase().cardio).replace('{h}',phase().hiit);
+  const m=sets.match(/(\d+)\s*min/); if(m) return Number(m[1]);
+  const warm=Object.values(PLAN).some(p=>p.warm.includes(id));
+  const x=sets.match(/^(\d+)\s*×/); if(x) return warm ? Math.max(1, Number(x[1])) : Math.max(2, Math.ceil(Number(x[1])*2.5));
+  return 2;
+}
+function timerTarget(id){
+  if(id==='rest') return {name:'Rest between sets', min:1.5, rest:true};
+  if(id.startsWith('ex-g-')){ const e=EX[id.slice(5)]; return e ? {name:e.name, min:exMinutes(id.slice(5))} : null; }
+  return tasksFor(new Date()).find(x=>x.id===id) || null;
+}
 function startTimer(id){
-  const t = tasksFor(new Date()).find(x=>x.id===id); if(!t) return;
+  const t = timerTarget(id); if(!t) return;
   if(timer && timer.id!==id && !confirmSwitch()) return;
-  timer = {id, name:t.name, total:t.min*60, left:t.min*60, running:true, last:Date.now()};
+  timer = {id, name:t.name, total:t.min*60, left:t.min*60, running:true, last:Date.now(), rest:!!t.rest};
   stopAlarm(); renderTimer(); renderToday();
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(!t.rest) window.scrollTo({top:0,behavior:'smooth'});
 }
 function confirmSwitch(){ toast('Switched timer'); return true; }
 function renderTimer(){
@@ -489,6 +539,7 @@ function renderTimer(){
 function finishTimer(early){
   const t=timer; if(!t) return;
   timer=null; renderTimer(); renderToday();
+  if(t.rest){ beep(); setTimeout(beep,600); try{ navigator.vibrate && navigator.vibrate([300,150,300]); }catch(e){} toast('💪 Rest over — next set!'); return; }
   if(!early) startAlarm();
   showModal(`<h3>⏰ ${esc(t.name)}</h3><p class="mut">${early?'Finished early.':'Time is up!'} Did you complete this task?</p>
     <div class="acts"><button class="btn" data-m="no">Not yet</button><button class="btn pri" data-m="yes">Yes, done ✓</button></div>`,
