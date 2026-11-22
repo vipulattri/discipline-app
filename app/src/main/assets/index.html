@@ -171,7 +171,7 @@ select{font:inherit;color:var(--txt);background:var(--card2);border:1px solid va
   <button data-v="body"><span>⚖️</span>Body</button>
   <button data-v="streak"><span>🔥</span>Streak</button>
   <button data-v="stats"><span>📊</span>Stats</button>
-  <button data-v="hack"><span>🖥️</span>Hack</button>
+  <button data-v="hack"><span>📊</span>Learn</button>
   <button data-v="plan"><span>🗓️</span>Plan</button>
 </div></nav>
 
@@ -1237,21 +1237,21 @@ let lastDay=dk();
 /* ---------- hacking study module ---------- */
 const HACK_TOTAL = 180;
 const HACK_WEEK1 = [
-  {w:['Linux Essentials for Hackers (start)','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['Install VirtualBox + Kali (or Ubuntu)',''], n:'What Linux & Kali are for'},
-  {w:['Linux Essentials for Hackers (part 2)','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['OverTheWire Bandit levels 0–2','https://overthewire.org/wargames/bandit/'], n:'10 core Linux commands'},
-  {w:['Linux Essentials for Hackers (part 3)','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['Bandit levels 3–5','https://overthewire.org/wargames/bandit/'], n:'File permissions & sudo'},
-  {w:['How does the internet work (full)','https://www.youtube.com/watch?v=zN8YNNHcaZc'], p:['Bandit levels 6–8','https://overthewire.org/wargames/bandit/'], n:'IP, port, TCP vs UDP'},
-  {w:['How the internet works (HTTP part)','https://www.youtube.com/watch?v=zN8YNNHcaZc'], p:['Inspect requests in browser DevTools',''], n:'GET vs POST, status codes'},
-  {w:['Web App Pentest — cookies & HTTP','https://www.youtube.com/watch?v=2_lswM1S264'], p:['Find the cookies in DevTools',''], n:'What a session token is'},
-  {w:['Review day — no new video',''], p:['Redo 2 Bandit levels from memory','https://overthewire.org/wargames/bandit/'], n:'Reread the week’s notes'},
+  {w:['Python for Beginners (start)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['Install Python + VS Code (or use Google Colab)','https://colab.research.google.com/'], n:'What Python is & how to run it'},
+  {w:['Python for Beginners (part 2)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['Kaggle: Learn Python (lesson 1)','https://www.kaggle.com/learn/python'], n:'Variables & data types'},
+  {w:['Python for Beginners (part 3)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['HackerRank Python (easy)','https://www.hackerrank.com/domains/python'], n:'If/else & loops'},
+  {w:['Python for Beginners (part 4)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['Write a small script yourself',''], n:'Functions'},
+  {w:['Python for Beginners (part 5)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['Kaggle: Learn Python (lists/dicts)','https://www.kaggle.com/learn/python'], n:'Lists, dicts, sets'},
+  {w:['Python for Beginners (part 6)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['Build a mini project (calculator)',''], n:'Putting it together'},
+  {w:['Review day — no new video',''], p:['Redo 2 Kaggle/HackerRank exercises','https://www.kaggle.com/learn/python'], n:'Reread the week’s notes'},
 ];
 const HACK_PHASES = [
-  {to:24,  name:'Phase 0 · Foundations',             w:['Linux Essentials for Hackers','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['OverTheWire Bandit','https://overthewire.org/wargames/bandit/'], n:'What you learned + any new command'},
-  {to:48,  name:'Phase 1 · Web + OWASP Top 10',       w:['Web App Penetration Testing','https://www.youtube.com/watch?v=2_lswM1S264'], p:['PortSwigger: Access control labs','https://portswigger.net/web-security/access-control'], n:'Which OWASP category + how the bug works'},
-  {to:96,  name:'Phase 2 · Web exploitation (Burp)',  w:['License to Pentest (full course)','https://www.youtube.com/watch?v=U_EhnbpWhUQ'], p:['PortSwigger labs + Juice Shop','https://portswigger.net/web-security/all-labs'], n:'The lab you solved + the fix'},
-  {to:132, name:'Phase 3 · Network & system pentest', w:['Beginner Network Pentest (TCM)','https://www.youtube.com/watch?v=3Kq1MIfTWCE'], p:['TryHackMe / HackTheBox','https://tryhackme.com/'], n:'Enumeration findings + how you got in'},
-  {to:160, name:'Phase 4/5 · Python + Bug bounty',    w:['Python for Beginners (full course)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['HackerOne / Bugcrowd (in scope only)','https://www.hackerone.com/'], n:'What you tried + report idea'},
-  {to:180, name:'Phase 6 · Specialize',               w:['Web App Pentest (revisit, go deep)','https://www.youtube.com/watch?v=2_lswM1S264'], p:['Deep labs in your area','https://portswigger.net/web-security/all-labs'], n:'Your specialization + next goal'},
+  {to:24,  name:'Phase 0 · Python fundamentals',   w:['Python for Beginners (full course)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['Kaggle: Learn Python','https://www.kaggle.com/learn/python'], n:'The concept + one script you wrote'},
+  {to:60,  name:'Phase 1 · Data analysis (Pandas)', w:['Data Analysis with Python (NumPy/Pandas)','https://www.youtube.com/watch?v=r-uOLxNrNk8'], p:['Kaggle: Pandas','https://www.kaggle.com/learn/pandas'], n:'What you analyzed + one insight'},
+  {to:84,  name:'Phase 2 · SQL for data',           w:['SQL Full Database Course','https://www.youtube.com/watch?v=HXV3zeQKqGY'], p:['HackerRank SQL','https://www.hackerrank.com/domains/sql'], n:'The query + what it answered'},
+  {to:112, name:'Phase 3 · Statistics',             w:['Statistics — Data Science Basics','https://www.youtube.com/watch?v=xxpc-HPKN28'], p:['Apply a stat to a real dataset','https://www.kaggle.com/datasets'], n:'The concept + an example'},
+  {to:150, name:'Phase 4 · Machine Learning',       w:['Machine Learning for Everybody','https://www.youtube.com/watch?v=i_LwzRVP7bg'], p:['Kaggle: Intro to Machine Learning','https://www.kaggle.com/learn/intro-to-machine-learning'], n:'The algorithm + your result'},
+  {to:180, name:'Phase 5/6 · ML projects + portfolio', w:['ML with Python & Scikit-Learn','https://www.youtube.com/watch?v=hDKCxebp88A'], p:['Kaggle competitions (build a project)','https://www.kaggle.com/competitions'], n:'Your project + what you built'},
 ];
 function hackDoneCount(){ let c=0; for(const k in state.days){ if(state.days[k].done && state.days[k].done.hack) c++; } return c; }
 function hackPlan(day){
@@ -1276,14 +1276,14 @@ function renderHack(){
     '<div class="prog" style="margin:10px 0 4px"><i style="width:'+pct+'%"></i></div>'+
     '<div class="mut small" style="text-align:center;margin-bottom:14px">'+done+' days done · '+pct+'%</div>'+
     '<div class="card" style="border-color:#1f5f58">'+
-      '<h2>🖥️ Tonight’s 90 minutes <span class="badge g">7:30–9:00 PM</span></h2>'+
+      '<h2>📊 Tonight’s 90 minutes <span class="badge g">7:30–9:00 PM</span></h2>'+
       '<div class="task '+(todayDone?'done':'')+'"><div class="ticon">📺</div><div class="tbody"><div class="tname">Watch</div><div class="tmeta">'+hlnk(pl.w)+'</div></div></div>'+
       '<div class="task '+(todayDone?'done':'')+'"><div class="ticon">📝</div><div class="tbody"><div class="tname">Note</div><div class="tmeta">'+esc(pl.n)+'</div></div></div>'+
       '<div class="task '+(todayDone?'done':'')+'"><div class="ticon">🎯</div><div class="tbody"><div class="tname">Practice</div><div class="tmeta">'+hlnk(pl.p)+'</div></div></div>'+
       '<button class="btn '+(todayDone?'':'pri')+' block" data-check="hack" style="margin-top:6px">'+(todayDone?'✓ Done today — tap to undo':'Mark today done ✓')+'</button>'+
     '</div>'+
     '<div class="card"><h2>🗺️ The 6-month path</h2><ul class="list">'+pathRows+'</ul>'+
-      '<div class="small mut" style="margin-top:10px;line-height:1.5">Every night: <b style="color:var(--txt)">watch one thing → note what you learned → go break that phase’s lab.</b> Only practise on labs or systems you own or are allowed to test.</div>'+
+      '<div class="small mut" style="margin-top:10px;line-height:1.5">Every night: <b style="color:var(--txt)">watch one thing → code along → practise on a real dataset.</b> Build small projects as you go — a portfolio on Kaggle/GitHub is what gets you hired.</div>'+
     '</div>';
 }
 
