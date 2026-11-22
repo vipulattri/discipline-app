@@ -37,6 +37,9 @@ public class BlockerService extends AccessibilityService {
     static final List<String> WORDS = Arrays.asList(
             "sex", "sexy", "xxx", "nude", "nudes", "naked", "boobs", "tits", "milf", "nangi", "bf video");
 
+    /** Apps blocked during the nightly focus window (7:30–10:00 PM). */
+    static final String[] FOCUS_APPS = { "com.instagram.android", "com.instagram.lite" };
+
     static final String[] URL_BAR_IDS = {
             "com.android.chrome:id/url_bar",
             "com.android.chrome:id/search_box_text",
@@ -111,6 +114,13 @@ public class BlockerService extends AccessibilityService {
         String pkg = e.getPackageName().toString();
         if (pkg.equals(getPackageName()) || pkg.equals("com.android.systemui")) return;
         if (!Util.prefs(this).getBoolean("blockerOn", true)) return;
+
+        // Nightly focus lock: block Instagram (and similar) between 7:30 and 10:00 PM.
+        if (isFocusApp(pkg) && Util.prefs(this).getBoolean("igBlockOn", true) && inFocusWindow()) {
+            kickOutFocus(pkg);
+            return;
+        }
+
         loadWords();
 
         int type = e.getEventType();
@@ -180,6 +190,39 @@ public class BlockerService extends AccessibilityService {
                 startActivity(i);
             } catch (Exception ignored) {}
         }, 1100);
+    }
+
+    private long lastFocusKick = 0;
+
+    private boolean isFocusApp(String pkg) {
+        for (String p : FOCUS_APPS) if (p.equals(pkg)) return true;
+        return false;
+    }
+
+    /** True between 19:30 and 22:00 local time. */
+    private boolean inFocusWindow() {
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        int mins = c.get(java.util.Calendar.HOUR_OF_DAY) * 60 + c.get(java.util.Calendar.MINUTE);
+        return mins >= (19 * 60 + 30) && mins < (22 * 60);
+    }
+
+    private void kickOutFocus(String pkg) {
+        long now = System.currentTimeMillis();
+        if (now - lastFocusKick < 2000) return;
+        lastFocusKick = now;
+        performGlobalAction(GLOBAL_ACTION_BACK);
+        handler.postDelayed(() -> performGlobalAction(GLOBAL_ACTION_HOME), 150);
+        handler.postDelayed(() -> {
+            try {
+                ActivityManager am = getSystemService(ActivityManager.class);
+                if (am != null && !pkg.equals(getPackageName())) am.killBackgroundProcesses(pkg);
+            } catch (Exception ignored) {}
+        }, 700);
+        handler.postDelayed(() -> {
+            try {
+                Toast.makeText(this, "📵 Instagram is off till 10 PM — focus time, go study.", Toast.LENGTH_LONG).show();
+            } catch (Exception ignored) {}
+        }, 850);
     }
 
     @Override
