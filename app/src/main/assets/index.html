@@ -345,6 +345,7 @@ const TASKS = [
   {id:'almond',  g:'diet',    icon:'🌰', name:'5 almonds before gym',           min:1, time:'06:40', days:[1,2,3,4,5,6]},
   {id:'sunflower',g:'diet',   icon:'🌻', name:'Sunflower seeds (afternoon)',    min:1, time:'16:00'},
   {id:'pumpkin', g:'diet',    icon:'🎃', name:'Pumpkin seeds (20 min before sleep)', min:1, time:'23:10'},
+  {id:'english', g:'evening', icon:'🗣️', name:'English speaking session with Claude', min:60, time:'21:00', end:'22:00', days:[0,6]},
 ];
 const REMINDERS = [
   {t:'06:00', msg:'Good morning! Start your routine: walk → gym → face wash → ice roller → gua sha → serum → sunscreen → lip cream → lookmaxxing.'},
@@ -363,6 +364,7 @@ const REMINDERS = [
   {t:'06:40', msg:'🌰 Eat 5 almonds before gym for steady energy.', days:[1,2,3,4,5,6]},
   {t:'16:00', msg:'🌻 Afternoon sunflower seeds — healthy fats and a protein nudge.'},
   {t:'23:10', msg:'🎃 Pumpkin seeds now — 20 minutes before sleep (magnesium + zinc help you rest).'},
+  {t:'21:00', msg:'🗣️ English speaking session with Claude now (9–10 PM). Open Claude and speak out loud.', days:[0,6]},
   {t:'23:00', msg:'✅ Day done. Mark your tasks and wind down — no phone in bed.'},
 ];
 const MILES = [1,3,7,14,21,30,60,90,180,365];
@@ -1235,21 +1237,21 @@ let lastDay=dk();
 /* ---------- hacking study module ---------- */
 const HACK_TOTAL = 180;
 const HACK_WEEK1 = [
-  {w:['NetworkChuck — Linux & Kali intro','https://www.youtube.com/@NetworkChuck'], p:['Install VirtualBox + Kali (or Ubuntu)',''], n:'What Linux & Kali are for'},
-  {w:['HackerSploit — Linux for Ethical Hackers','https://www.youtube.com/watch?v=lZAoFs75_cs'], p:['OverTheWire Bandit levels 0–2','https://overthewire.org/wargames/bandit/'], n:'10 core Linux commands'},
-  {w:['Linux course — next 30 min','https://www.youtube.com/watch?v=lZAoFs75_cs'], p:['Bandit levels 3–5','https://overthewire.org/wargames/bandit/'], n:'File permissions & sudo'},
-  {w:['NetworkChuck — how the internet works','https://www.youtube.com/@NetworkChuck'], p:['Bandit levels 6–8','https://overthewire.org/wargames/bandit/'], n:'IP, port, TCP vs UDP'},
-  {w:['PortSwigger — intro to HTTP','https://www.youtube.com/@PortSwiggerTV'], p:['Inspect requests in browser DevTools',''], n:'GET vs POST, status codes'},
-  {w:['Cookies & sessions explained','https://www.youtube.com/@NetworkChuck'], p:['Find the cookies in DevTools',''], n:'What a session token is'},
+  {w:['Linux Essentials for Hackers (start)','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['Install VirtualBox + Kali (or Ubuntu)',''], n:'What Linux & Kali are for'},
+  {w:['Linux Essentials for Hackers (part 2)','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['OverTheWire Bandit levels 0–2','https://overthewire.org/wargames/bandit/'], n:'10 core Linux commands'},
+  {w:['Linux Essentials for Hackers (part 3)','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['Bandit levels 3–5','https://overthewire.org/wargames/bandit/'], n:'File permissions & sudo'},
+  {w:['How does the internet work (full)','https://www.youtube.com/watch?v=zN8YNNHcaZc'], p:['Bandit levels 6–8','https://overthewire.org/wargames/bandit/'], n:'IP, port, TCP vs UDP'},
+  {w:['How the internet works (HTTP part)','https://www.youtube.com/watch?v=zN8YNNHcaZc'], p:['Inspect requests in browser DevTools',''], n:'GET vs POST, status codes'},
+  {w:['Web App Pentest — cookies & HTTP','https://www.youtube.com/watch?v=2_lswM1S264'], p:['Find the cookies in DevTools',''], n:'What a session token is'},
   {w:['Review day — no new video',''], p:['Redo 2 Bandit levels from memory','https://overthewire.org/wargames/bandit/'], n:'Reread the week’s notes'},
 ];
 const HACK_PHASES = [
-  {to:24,  name:'Phase 0 · Foundations',             w:['Linux for Ethical Hackers','https://www.youtube.com/watch?v=lZAoFs75_cs'], p:['OverTheWire Bandit','https://overthewire.org/wargames/bandit/'], n:'What you learned + any new command'},
-  {to:48,  name:'Phase 1 · Web + OWASP Top 10',       w:['PortSwigger channel','https://www.youtube.com/@PortSwiggerTV'], p:['PortSwigger: Access control labs','https://portswigger.net/web-security/access-control'], n:'Which OWASP category + how the bug works'},
-  {to:96,  name:'Phase 2 · Web exploitation (Burp)',  w:['License to Pentest','https://www.youtube.com/watch?v=U_EhnbpWhUQ'], p:['PortSwigger labs + Juice Shop','https://portswigger.net/web-security/all-labs'], n:'The lab you solved + the fix'},
-  {to:132, name:'Phase 3 · Network & system pentest', w:['TCM Beginner Network Pentest','https://www.youtube.com/watch?v=3Kq1MIfTWCE'], p:['TryHackMe / HackTheBox','https://tryhackme.com/'], n:'Enumeration findings + how you got in'},
-  {to:160, name:'Phase 4/5 · Python + Bug bounty',    w:['How to Be an Ethical Hacker','https://www.youtube.com/@TCMSecurityAcademy'], p:['HackerOne / Bugcrowd (in scope only)','https://www.hackerone.com/'], n:'What you tried + report idea'},
-  {to:180, name:'Phase 6 · Specialize',               w:['Pick your path (web/network/cloud)','https://www.youtube.com/@TCMSecurityAcademy'], p:['Deep labs in your area','https://portswigger.net/web-security/all-labs'], n:'Your specialization + next goal'},
+  {to:24,  name:'Phase 0 · Foundations',             w:['Linux Essentials for Hackers','https://www.youtube.com/watch?v=1hvVcEhcbLM'], p:['OverTheWire Bandit','https://overthewire.org/wargames/bandit/'], n:'What you learned + any new command'},
+  {to:48,  name:'Phase 1 · Web + OWASP Top 10',       w:['Web App Penetration Testing','https://www.youtube.com/watch?v=2_lswM1S264'], p:['PortSwigger: Access control labs','https://portswigger.net/web-security/access-control'], n:'Which OWASP category + how the bug works'},
+  {to:96,  name:'Phase 2 · Web exploitation (Burp)',  w:['License to Pentest (full course)','https://www.youtube.com/watch?v=U_EhnbpWhUQ'], p:['PortSwigger labs + Juice Shop','https://portswigger.net/web-security/all-labs'], n:'The lab you solved + the fix'},
+  {to:132, name:'Phase 3 · Network & system pentest', w:['Beginner Network Pentest (TCM)','https://www.youtube.com/watch?v=3Kq1MIfTWCE'], p:['TryHackMe / HackTheBox','https://tryhackme.com/'], n:'Enumeration findings + how you got in'},
+  {to:160, name:'Phase 4/5 · Python + Bug bounty',    w:['Python for Beginners (full course)','https://www.youtube.com/watch?v=eWRfhZUzrAc'], p:['HackerOne / Bugcrowd (in scope only)','https://www.hackerone.com/'], n:'What you tried + report idea'},
+  {to:180, name:'Phase 6 · Specialize',               w:['Web App Pentest (revisit, go deep)','https://www.youtube.com/watch?v=2_lswM1S264'], p:['Deep labs in your area','https://portswigger.net/web-security/all-labs'], n:'Your specialization + next goal'},
 ];
 function hackDoneCount(){ let c=0; for(const k in state.days){ if(state.days[k].done && state.days[k].done.hack) c++; } return c; }
 function hackPlan(day){
