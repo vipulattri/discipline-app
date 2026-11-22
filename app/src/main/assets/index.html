@@ -341,10 +341,10 @@ const TASKS = [
   {id:'curd',    g:'diet',    icon:'🥣', name:'Curd with lunch + extra dal',   min:2, time:'13:30'},
   {id:'snack',   g:'diet',    icon:'🫘', name:'Soya chunks / sprouts / chana', min:5, time:'17:00'},
   {id:'water',   g:'diet',    icon:'🚰', name:'Drink 3–4 L water',            min:1, time:''},
-  {id:'chia',    g:'diet',    icon:'🫗', name:'Chia seeds in water (morning)',   min:1, time:'06:05'},
-  {id:'almond',  g:'diet',    icon:'🌰', name:'5 almonds before gym',           min:1, time:'06:40', days:[1,2,3,4,5,6]},
+  {id:'chia',    g:'diet',    icon:'🫗', name:'Chia seeds in water (morning)',   min:1, time:'06:05', must:true},
+  {id:'almond',  g:'diet',    icon:'🌰', name:'5 almonds before gym',           min:1, time:'06:40', days:[1,2,3,4,5,6], must:true},
   {id:'sunflower',g:'diet',   icon:'🌻', name:'Sunflower seeds (afternoon)',    min:1, time:'16:00'},
-  {id:'pumpkin', g:'diet',    icon:'🎃', name:'Pumpkin seeds (20 min before sleep)', min:1, time:'23:10'},
+  {id:'pumpkin', g:'diet',    icon:'🎃', name:'Pumpkin seeds (20 min before sleep)', min:1, time:'23:10', must:true},
   {id:'english', g:'evening', icon:'🗣️', name:'English speaking session with Claude', min:60, time:'21:00', end:'22:00', days:[0,6]},
 ];
 const REMINDERS = [
@@ -461,7 +461,7 @@ function taskHTML(t){
   const when = t.time ? fmt12(t.time)+(t.end?' – '+fmt12(t.end):'') : 'Any time';
   return `<div class="task ${done?'done':''} ${act?'active':''}">
     <div class="ticon">${esc(t.icon||'⭐')}</div>
-    <div class="tbody"><div class="tname">${esc(t.name)}${t.id==='gym'&&typeof PLAN!=='undefined'?' — '+esc(PLAN[new Date().getDay()].title):''}</div>
+    <div class="tbody"><div class="tname">${esc(t.name)}${t.id==='gym'&&typeof PLAN!=='undefined'?' — '+esc(PLAN[new Date().getDay()].title):''}${t.must?' <span class="badge">Must</span>':''}</div>
       <div class="tmeta">${when} · ${t.min} min${done?' · done '+new Date(state.days[k].done[t.id]).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):''}</div></div>
     <div class="tact">
       ${t.open?`<button class="ib" data-open="${t.open}" title="Open exercises">📋</button>`:''}
