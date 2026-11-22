@@ -171,6 +171,7 @@ select{font:inherit;color:var(--txt);background:var(--card2);border:1px solid va
   <button data-v="body"><span>⚖️</span>Body</button>
   <button data-v="streak"><span>🔥</span>Streak</button>
   <button data-v="stats"><span>📊</span>Stats</button>
+  <button data-v="hack"><span>🖥️</span>Hack</button>
   <button data-v="plan"><span>🗓️</span>Plan</button>
 </div></nav>
 
@@ -288,6 +289,9 @@ select{font:inherit;color:var(--txt);background:var(--card2);border:1px solid va
     </div>
   </section>
 
+  <!-- HACK -->
+  <section class="view" id="v-hack"><div id="hackBody"></div></section>
+
   <!-- PLAN -->
   <section class="view" id="v-plan">
     <div class="card"><h2>🗓️ Your daily schedule</h2><div class="tl" id="timeline"></div></div>
@@ -337,6 +341,10 @@ const TASKS = [
   {id:'curd',    g:'diet',    icon:'🥣', name:'Curd with lunch + extra dal',   min:2, time:'13:30'},
   {id:'snack',   g:'diet',    icon:'🫘', name:'Soya chunks / sprouts / chana', min:5, time:'17:00'},
   {id:'water',   g:'diet',    icon:'🚰', name:'Drink 3–4 L water',            min:1, time:''},
+  {id:'chia',    g:'diet',    icon:'🫗', name:'Chia seeds in water (morning)',   min:1, time:'06:05'},
+  {id:'almond',  g:'diet',    icon:'🌰', name:'5 almonds before gym',           min:1, time:'06:40', days:[1,2,3,4,5,6]},
+  {id:'sunflower',g:'diet',   icon:'🌻', name:'Sunflower seeds (afternoon)',    min:1, time:'16:00'},
+  {id:'pumpkin', g:'diet',    icon:'🎃', name:'Pumpkin seeds (20 min before sleep)', min:1, time:'23:10'},
 ];
 const REMINDERS = [
   {t:'06:00', msg:'Good morning! Start your routine: walk → gym → face wash → ice roller → gua sha → serum → sunscreen → lip cream → lookmaxxing.'},
@@ -351,6 +359,10 @@ const REMINDERS = [
   {t:'19:31', msg:'🪡 Dermaroller night: on your clean face roll gently (up-down, side-to-side, diagonal), then apply serum. Disinfect the roller after.', days:[0,3]},
   {t:'21:00', msg:'🍽️ Dinner break (9:00–9:30 PM).'},
   {t:'21:30', msg:'💻 Freelancing work starts now (9:30–11:00 PM). Start the timer.'},
+  {t:'06:05', msg:'🫗 Drink your soaked chia-seed water now — fibre and hydration to start the day.'},
+  {t:'06:40', msg:'🌰 Eat 5 almonds before gym for steady energy.', days:[1,2,3,4,5,6]},
+  {t:'16:00', msg:'🌻 Afternoon sunflower seeds — healthy fats and a protein nudge.'},
+  {t:'23:10', msg:'🎃 Pumpkin seeds now — 20 minutes before sleep (magnesium + zinc help you rest).'},
   {t:'23:00', msg:'✅ Day done. Mark your tasks and wind down — no phone in bed.'},
 ];
 const MILES = [1,3,7,14,21,30,60,90,180,365];
@@ -1220,7 +1232,60 @@ document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
   renderAll(); window.scrollTo({top:0});
 });
 let lastDay=dk();
-function renderAll(){ if(!state.settings) return; renderQuote(); renderToday(); renderWorkout(); renderBody(); renderStreak(); renderStats(); renderPlan(); renderTimer(); syncNative(); syncBlocker(); renderBlocker(); tryAskWeigh(); }
+/* ---------- hacking study module ---------- */
+const HACK_TOTAL = 180;
+const HACK_WEEK1 = [
+  {w:['NetworkChuck — Linux & Kali intro','https://www.youtube.com/@NetworkChuck'], p:['Install VirtualBox + Kali (or Ubuntu)',''], n:'What Linux & Kali are for'},
+  {w:['HackerSploit — Linux for Ethical Hackers','https://www.youtube.com/watch?v=lZAoFs75_cs'], p:['OverTheWire Bandit levels 0–2','https://overthewire.org/wargames/bandit/'], n:'10 core Linux commands'},
+  {w:['Linux course — next 30 min','https://www.youtube.com/watch?v=lZAoFs75_cs'], p:['Bandit levels 3–5','https://overthewire.org/wargames/bandit/'], n:'File permissions & sudo'},
+  {w:['NetworkChuck — how the internet works','https://www.youtube.com/@NetworkChuck'], p:['Bandit levels 6–8','https://overthewire.org/wargames/bandit/'], n:'IP, port, TCP vs UDP'},
+  {w:['PortSwigger — intro to HTTP','https://www.youtube.com/@PortSwiggerTV'], p:['Inspect requests in browser DevTools',''], n:'GET vs POST, status codes'},
+  {w:['Cookies & sessions explained','https://www.youtube.com/@NetworkChuck'], p:['Find the cookies in DevTools',''], n:'What a session token is'},
+  {w:['Review day — no new video',''], p:['Redo 2 Bandit levels from memory','https://overthewire.org/wargames/bandit/'], n:'Reread the week’s notes'},
+];
+const HACK_PHASES = [
+  {to:24,  name:'Phase 0 · Foundations',             w:['Linux for Ethical Hackers','https://www.youtube.com/watch?v=lZAoFs75_cs'], p:['OverTheWire Bandit','https://overthewire.org/wargames/bandit/'], n:'What you learned + any new command'},
+  {to:48,  name:'Phase 1 · Web + OWASP Top 10',       w:['PortSwigger channel','https://www.youtube.com/@PortSwiggerTV'], p:['PortSwigger: Access control labs','https://portswigger.net/web-security/access-control'], n:'Which OWASP category + how the bug works'},
+  {to:96,  name:'Phase 2 · Web exploitation (Burp)',  w:['License to Pentest','https://www.youtube.com/watch?v=U_EhnbpWhUQ'], p:['PortSwigger labs + Juice Shop','https://portswigger.net/web-security/all-labs'], n:'The lab you solved + the fix'},
+  {to:132, name:'Phase 3 · Network & system pentest', w:['TCM Beginner Network Pentest','https://www.youtube.com/watch?v=3Kq1MIfTWCE'], p:['TryHackMe / HackTheBox','https://tryhackme.com/'], n:'Enumeration findings + how you got in'},
+  {to:160, name:'Phase 4/5 · Python + Bug bounty',    w:['How to Be an Ethical Hacker','https://www.youtube.com/@TCMSecurityAcademy'], p:['HackerOne / Bugcrowd (in scope only)','https://www.hackerone.com/'], n:'What you tried + report idea'},
+  {to:180, name:'Phase 6 · Specialize',               w:['Pick your path (web/network/cloud)','https://www.youtube.com/@TCMSecurityAcademy'], p:['Deep labs in your area','https://portswigger.net/web-security/all-labs'], n:'Your specialization + next goal'},
+];
+function hackDoneCount(){ let c=0; for(const k in state.days){ if(state.days[k].done && state.days[k].done.hack) c++; } return c; }
+function hackPlan(day){
+  if(day<=7) return HACK_WEEK1[day-1];
+  let prev=7; for(const ph of HACK_PHASES){ if(day<=ph.to){ return {w:ph.w,p:ph.p,n:ph.n,phase:ph.name}; } prev=ph.to; }
+  const last=HACK_PHASES[HACK_PHASES.length-1]; return {w:last.w,p:last.p,n:'Keep going',phase:'Done — keep hunting'};
+}
+function hackPhaseName(day){ let prev=0; for(const ph of HACK_PHASES){ if(day>prev && day<=ph.to) return ph.name; prev=ph.to; } return 'Keep going'; }
+function hlnk(a){ return a&&a[1] ? '<a href="'+esc(a[1])+'" target="_blank" rel="noopener" style="color:var(--acc)">'+esc(a[0])+'</a>' : esc(a?a[0]:''); }
+function renderHack(){
+  const box=$('#hackBody'); if(!box) return;
+  const done=hackDoneCount(), todayDone=isDone(dk(),'hack');
+  let day=todayDone?done:done+1; if(day<1) day=1; if(day>HACK_TOTAL) day=HACK_TOTAL;
+  const pct=Math.round(done*100/HACK_TOTAL);
+  const pl=hackPlan(day), phase=pl.phase||hackPhaseName(day);
+  let prev=0; const pathRows=HACK_PHASES.map(ph=>{ const cur=day>prev && day<=ph.to; prev=ph.to; return '<li>'+(cur?'▶ ':'• ')+esc(ph.name)+' — '+hlnk(ph.p)+'</li>'; }).join('');
+  box.innerHTML=
+    '<div class="streak-big" style="padding:18px 10px 6px">'+
+      '<div class="n" style="font-size:60px">Day '+day+'</div>'+
+      '<div class="mut small" style="margin-top:4px">of '+HACK_TOTAL+' · '+esc(phase)+'</div>'+
+    '</div>'+
+    '<div class="prog" style="margin:10px 0 4px"><i style="width:'+pct+'%"></i></div>'+
+    '<div class="mut small" style="text-align:center;margin-bottom:14px">'+done+' days done · '+pct+'%</div>'+
+    '<div class="card" style="border-color:#1f5f58">'+
+      '<h2>🖥️ Tonight’s 90 minutes <span class="badge g">7:30–9:00 PM</span></h2>'+
+      '<div class="task '+(todayDone?'done':'')+'"><div class="ticon">📺</div><div class="tbody"><div class="tname">Watch</div><div class="tmeta">'+hlnk(pl.w)+'</div></div></div>'+
+      '<div class="task '+(todayDone?'done':'')+'"><div class="ticon">📝</div><div class="tbody"><div class="tname">Note</div><div class="tmeta">'+esc(pl.n)+'</div></div></div>'+
+      '<div class="task '+(todayDone?'done':'')+'"><div class="ticon">🎯</div><div class="tbody"><div class="tname">Practice</div><div class="tmeta">'+hlnk(pl.p)+'</div></div></div>'+
+      '<button class="btn '+(todayDone?'':'pri')+' block" data-check="hack" style="margin-top:6px">'+(todayDone?'✓ Done today — tap to undo':'Mark today done ✓')+'</button>'+
+    '</div>'+
+    '<div class="card"><h2>🗺️ The 6-month path</h2><ul class="list">'+pathRows+'</ul>'+
+      '<div class="small mut" style="margin-top:10px;line-height:1.5">Every night: <b style="color:var(--txt)">watch one thing → note what you learned → go break that phase’s lab.</b> Only practise on labs or systems you own or are allowed to test.</div>'+
+    '</div>';
+}
+
+function renderAll(){ if(!state.settings) return; renderQuote(); renderToday(); renderWorkout(); renderBody(); renderStreak(); renderStats(); renderHack(); renderPlan(); renderTimer(); syncNative(); syncBlocker(); renderBlocker(); tryAskWeigh(); }
 setInterval(()=>{
   if(timer && timer.running){ const n=Date.now(); timer.left-= (n-timer.last)/1000; timer.last=n; if(timer.left<=0) finishTimer(false); else renderTimer(); }
   renderStreakTick();
